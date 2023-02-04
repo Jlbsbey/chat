@@ -1,0 +1,5 @@
+{
+  "action": "logout",
+  "object": "user",
+  "userid": 1
+}

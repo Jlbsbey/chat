@@ -1,0 +1,8 @@
+{
+  "action": "update_room",
+  "object": "user",
+  "userid": 1,
+  "data": {
+    "room_id": 1
+  }
+}

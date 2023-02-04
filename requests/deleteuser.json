@@ -1,0 +1,5 @@
+{
+  "action": "delete_user",
+  "object": "user",
+  "userid": 1
+}
