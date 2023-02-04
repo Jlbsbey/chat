@@ -1,9 +1,9 @@
 package main
 
 type User struct {
-	name     string          `json:"name"`
-	password string          `json:"password"`
+	Name     string          `json:"name"`
+	Password string          `json:"password"`
 	ID       uint64          `json:"id"`
-	email    string          `json:"email"`
-	room     map[uint64]bool `json:"room_id"`
+	Email    string          `json:"email"`
+	Room     map[uint64]bool `json:"room_id"`
 }
