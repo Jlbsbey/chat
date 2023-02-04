@@ -1,9 +1,6 @@
-package chat
+package main
 
 type Action struct {
 	Action  string
 	ObjName string
-}
-
-type SendMessage struct {
 }

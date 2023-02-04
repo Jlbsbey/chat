@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "object": "room",
+  "data": {
+    "name:": "room1",
+    "id": 1,
+    "allowedUsersID": [1]
+}

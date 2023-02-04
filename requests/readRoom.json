@@ -1,0 +1,13 @@
+{
+  "action": "read",
+  "object": "room",
+  "data": {
+    "name:": "room1",
+    "id": 1,
+    "allowedUsersID": [
+      1,
+      2,
+      3
+    ]
+  }
+}

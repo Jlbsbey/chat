@@ -1,5 +1,5 @@
 {
-  "action": "update_room",
+  "action": "update",
   "object": "user",
   "userid": 1,
   "data": {
