@@ -1,0 +1,15 @@
+{
+  "action": "create",
+  "object": "message",
+  "data": {
+    "author_id": 1,
+    "date": "2019-01-01 00:00:00",
+    "id": 1,
+    "image": null,
+    "is_changed": false,
+    "is_deleted": false,
+    "reply_message_id": null,
+    "room_id": 1,
+    "text": "123456"
+  }
+}

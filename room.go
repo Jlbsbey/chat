@@ -1,8 +1,8 @@
 package main
 
 type Room struct {
-	name     string
-	Messages []Message
-	id       uint64
-	users    map[uint64]uint32
+	Name     string            `json:"name"`
+	Messages []Message         `json:"messages"`
+	Id       uint64            `json:"id"`
+	Users    map[uint64]uint32 `json:"allowedUsersID"`
 }

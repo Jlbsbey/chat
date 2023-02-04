@@ -3,8 +3,10 @@ package main
 import "time"
 
 type Message struct {
-	attribute uint32
-	author    uint64
-	reply     uint64
-	sendTime  time.Time
+	Cont      Content
+	Author    uint64    `json:"author_id"`
+	Reply     uint64    `json:"reply_message_id"`
+	SendTime  time.Time `json:"date"`
+	IsChanged bool      `json:"is_changed"`
+	IsDeleted bool      `json:"is_deleted"`
 }
