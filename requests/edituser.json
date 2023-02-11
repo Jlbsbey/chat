@@ -3,6 +3,9 @@
   "object": "user",
   "userid": 1,
   "data": {
-    "room_id": 1
+    "room_id": 1,
+    "name:": "user1",
+    "password": "1234",
+    "email":"123@gmail.com"
   }
 }
