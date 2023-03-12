@@ -3,10 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"io/ioutil"
 )
 
-var FirstFreeID int = 1
+//var db *sql.DB
+
+var FirstFreeID int = 0
 
 type DB []GeneralObject
 
@@ -17,6 +20,22 @@ func (db DB) GetIndex(id string) int {
 		}
 	}
 	return -1
+}
+
+func cfg() {
+	cfg := mysql.NewConfig()
+	(*cfg).User = "root"
+	(*cfg).Addr = "localhost"
+	(*cfg).Passwd = "nikita2005"
+	(*cfg).Net = "tcp"
+	(*cfg).DBName = "chat"
+
+	/*db, err := sql.Open("mysql", cfg.FormatDSN())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}*/
+
 }
 
 func (db *DB) UseAction(path string) {
@@ -35,8 +54,8 @@ func (db *DB) UseAction(path string) {
 	switch action.ObjName {
 	case "user":
 		obj = &User{}
-	case "room":
-		obj = &Room{}
+	/*case "room":
+	obj = &Room{}*/
 	default:
 		fmt.Println("Unknown object", action.ObjName)
 	}
@@ -50,6 +69,8 @@ func (db *DB) UseAction(path string) {
 		toDo = obj.Delete()
 	case "read":
 		toDo = obj.Read()
+	case "login":
+		toDo = obj.Login()
 	default:
 		fmt.Println("Unknown action", action.Action)
 		return

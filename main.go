@@ -1,8 +1,12 @@
 package main
 
-func main() {
-	var db DB
+/*
+	func main() {
+		var db DB
+
 }
+*/
+var db DB
 
 type DefinedAction interface {
 	GetFromJSON([]byte)
@@ -14,6 +18,7 @@ type GeneralObject interface {
 	Edit() DefinedAction
 	Delete() DefinedAction
 	Read() DefinedAction
+	Login() DefinedAction
 	Print()
 	GetID() string
 }
