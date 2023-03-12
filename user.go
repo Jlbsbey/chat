@@ -10,13 +10,6 @@ import (
 	"strings"
 )
 
-type UserTemp struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	ID       int    `json:"id"`
-	Email    string `json:"email"`
-}
-
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -59,8 +52,7 @@ func (action *LoginUser) GetFromJSON(rawData []byte) {
 	}
 }
 func (action LoginUser) Process(db *DB) {
-	folderPath := "C:\\program1\\go_spec\\chat\\users"
-	fmt.Println("login2")
+	folderPath := "users/user1.json"
 	count := 0
 	filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -71,8 +63,7 @@ func (action LoginUser) Process(db *DB) {
 		}
 		return nil
 	})
-	var i int
-	for i = 1; i <= count; i++ {
+	for i := 1; i <= count; i++ {
 		jsonFile, err := ioutil.ReadFile("users/user" + strconv.Itoa(i) + ".json")
 		if err != nil {
 			fmt.Println(err)
@@ -84,19 +75,13 @@ func (action LoginUser) Process(db *DB) {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(json_user.Username)
-		fmt.Println(action.Data.Username)
-		fmt.Println(json_user.Password)
-		fmt.Println(action.Data.Password)
 		if json_user.Username == action.Data.Username && json_user.Password == action.Data.Password {
 			fmt.Println("Login successful")
 			return
-		} else {
-			fmt.Println("Login failed")
-			return
 		}
-
 	}
+	fmt.Println("Login failed")
+	return
 }
 func (u User) Create() DefinedAction {
 	return &CreateUser{}

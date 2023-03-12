@@ -8,8 +8,10 @@ import (
 )
 
 type User struct {
-	Username string `json:"name"`
+	Username string `json:"username"`
 	Password string `json:"password"`
+	ID       string `json:"id"`
+	Email    string `json:"email"`
 }
 
 func main() {
@@ -47,11 +49,10 @@ func sendToConnection(conn net.Conn) {
 	}
 	for {
 		fmt.Scan(&s)
-		n, err := conn.Write([]byte(s))
+		_, err := conn.Write([]byte(s))
 		if err != nil {
 			panic(err)
 		}
-		log.Printf("Sent %d bytes", n)
 	}
 }
 

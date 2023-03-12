@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net"
 )
 
@@ -22,7 +21,7 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	//go sendToConnection(conn)
+	go sendToConnection(conn)
 	buf := make([]byte, 1024)
 	for {
 		n, err := conn.Read(buf)
@@ -31,12 +30,24 @@ func handleConnection(conn net.Conn) {
 			db.RecAction(buf[:n])
 		} else if string(buf[:n]) == "/::create" {
 
+		} else {
+			fmt.Println(string(buf[:n]))
 		}
 		if err != nil {
 			panic(err)
 		}
 
-		log.Println(string(buf[:n]))
+	}
+}
+
+func sendToConnection(conn net.Conn) {
+	var s string
+	for {
+		fmt.Scan(&s)
+		_, err := conn.Write([]byte(s))
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -69,7 +80,6 @@ func (db *DB) RecAction(text []byte) {
 	case "read":
 		obj.Read()
 	case "login":
-		fmt.Println("login1")
 		defact = obj.Login()
 	default:
 		fmt.Println("Unknown action", action.Action)
@@ -77,5 +87,4 @@ func (db *DB) RecAction(text []byte) {
 	}
 	defact.GetFromJSON(text)
 	defact.Process(db)
-
 }
