@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net"
 )
 
@@ -30,8 +29,10 @@ func handleConnections(conn net.Conn) {
 		if err != nil {
 			panic(err)
 		}
-
-		log.Println(string(buf[:n]))
+		if string(buf[:n]) == "|::failed" {
+			return
+		}
+		fmt.Println(string(buf[:n]))
 	}
 }
 

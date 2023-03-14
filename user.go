@@ -3,11 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
+	"log"
 )
 
 type User struct {
@@ -38,6 +34,8 @@ type LoginUser struct {
 	Data struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
+		Email    string `json:"email"`
+		ID       string `json:"id"`
 	} `json:"data"`
 }
 
@@ -51,32 +49,26 @@ func (action *LoginUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action LoginUser) Process(db *DB) {
-	folderPath := "users/user1.json"
-	count := 0
-	filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+func (action LoginUser) Process(dB *DB) {
+	us := `SELECT Login, Password FROM users WHERE Login = ? AND Password = ?`
+
+	lg, err := db.Query(us, action.Data.Username, action.Data.Password)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var login, passw string
+	for lg.Next() {
+		if err = lg.Scan(&login, &passw); err != nil {
+			log.Println(err)
 		}
-		if !info.IsDir() && strings.HasSuffix(path, ".json") {
-			count++
-		}
-		return nil
-	})
-	for i := 1; i <= count; i++ {
-		jsonFile, err := ioutil.ReadFile("users/user" + strconv.Itoa(i) + ".json")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		var json_user User
-		err = json.Unmarshal(jsonFile, &json_user)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		if json_user.Username == action.Data.Username && json_user.Password == action.Data.Password {
+		if login == action.Data.Username && passw == action.Data.Password {
+			logined = true
 			fmt.Println("Login successful")
+			return
+		}
+		if err != nil {
+			fmt.Println(err)
 			return
 		}
 	}
@@ -93,11 +85,8 @@ func (action *CreateUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action CreateUser) Process(db *DB) {
-	action.U.ID = fmt.Sprint(FirstFreeID)
-	FirstFreeID++
-	*db = append(*db, action.U)
-}
+func (action CreateUser) Process(dB *DB) {}
+
 func (u User) Edit() DefinedAction {
 	return &EditUser{}
 }
@@ -108,10 +97,7 @@ func (action *EditUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action EditUser) Process(db *DB) {
-	id := action.U.GetID()
-	(*db)[db.GetIndex(id)] = action.U
-}
+func (action EditUser) Process(dB *DB) {}
 
 func (u User) Delete() DefinedAction {
 	return &DeleteUser{}
@@ -123,13 +109,7 @@ func (action *DeleteUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action DeleteUser) Process(db *DB) {
-	for i, p := range *db {
-		if p.GetID() == action.Data.ID {
-			*db = append((*db)[:i], (*db)[i+1:]...)
-		}
-	}
-}
+func (action DeleteUser) Process(dB *DB) {}
 
 func (u User) Read() DefinedAction {
 	return &ReadUser{}
@@ -141,9 +121,7 @@ func (action *ReadUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action ReadUser) Process(db *DB) {
-	(*db)[db.GetIndex(action.Data.ID)].Print()
-}
+func (action ReadUser) Process(dB *DB) {}
 
 func (u User) Print() {
 	fmt.Printf("Name: %s, Password: %s, ID: %d, Email: %s, Room: %v", u.Username, u.Password, u.ID, u.Email)

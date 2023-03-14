@@ -6,11 +6,10 @@ package main
 
 }
 */
-var db DB
 
 type DefinedAction interface {
 	GetFromJSON([]byte)
-	Process(db *DB)
+	Process(dB *DB)
 }
 
 type GeneralObject interface {

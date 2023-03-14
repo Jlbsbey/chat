@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	cfg()
 	ln, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		panic(err)
@@ -27,7 +28,10 @@ func handleConnection(conn net.Conn) {
 		n, err := conn.Read(buf)
 		if string(buf[:n]) == "/::login" {
 			n, _ = conn.Read(buf)
-			db.RecAction(buf[:n])
+			dB.RecAction(buf[:n])
+			if logined == false {
+				conn.Write([]byte("|::failed"))
+			}
 		} else if string(buf[:n]) == "/::create" {
 
 		} else {
@@ -51,7 +55,8 @@ func sendToConnection(conn net.Conn) {
 	}
 }
 
-func (db *DB) RecAction(text []byte) {
+func (dB *DB) RecAction(text []byte) {
+	logined = false
 	var action Action
 	err := json.Unmarshal(text, &action)
 	if err != nil {
@@ -86,5 +91,5 @@ func (db *DB) RecAction(text []byte) {
 		return
 	}
 	defact.GetFromJSON(text)
-	defact.Process(db)
+	defact.Process(dB)
 }

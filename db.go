@@ -1,15 +1,15 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
 	"fmt"
 	"github.com/go-sql-driver/mysql"
-	"io/ioutil"
 )
 
-//var db *sql.DB
-
+var db *sql.DB
+var logined bool
 var FirstFreeID int = 0
+var dB *DB
 
 type DB []GeneralObject
 
@@ -29,52 +29,10 @@ func cfg() {
 	(*cfg).Passwd = "nikita2005"
 	(*cfg).Net = "tcp"
 	(*cfg).DBName = "chat"
-
-	/*db, err := sql.Open("mysql", cfg.FormatDSN())
-	if err != nil {
-		fmt.Println(err)
-		return
-	}*/
-
-}
-
-func (db *DB) UseAction(path string) {
-	text, err := ioutil.ReadFile(path)
+	var err error
+	db, err = sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	var action Action
-	err = json.Unmarshal(text, &action)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var obj GeneralObject
-	switch action.ObjName {
-	case "user":
-		obj = &User{}
-	/*case "room":
-	obj = &Room{}*/
-	default:
-		fmt.Println("Unknown object", action.ObjName)
-	}
-	var toDo DefinedAction
-	switch action.Action {
-	case "create":
-		toDo = obj.Create()
-	case "edit":
-		toDo = obj.Edit()
-	case "delete":
-		toDo = obj.Delete()
-	case "read":
-		toDo = obj.Read()
-	case "login":
-		toDo = obj.Login()
-	default:
-		fmt.Println("Unknown action", action.Action)
-		return
-	}
-	toDo.GetFromJSON(text)
-	toDo.Process(db)
 }
