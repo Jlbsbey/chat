@@ -49,7 +49,7 @@ func (action *LoginUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action LoginUser) Process(dB *DB) {
+func (action LoginUser) Process( /*dB *DB*/ ) {
 	us := `SELECT Login, Password FROM users WHERE Login = ? AND Password = ?`
 
 	lg, err := db.Query(us, action.Data.Username, action.Data.Password)
@@ -85,7 +85,7 @@ func (action *CreateUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action CreateUser) Process(dB *DB) {}
+func (action CreateUser) Process( /*dB *DB*/ ) {}
 
 func (u User) Edit() DefinedAction {
 	return &EditUser{}
@@ -97,7 +97,7 @@ func (action *EditUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action EditUser) Process(dB *DB) {}
+func (action EditUser) Process( /*dB *DB*/ ) {}
 
 func (u User) Delete() DefinedAction {
 	return &DeleteUser{}
@@ -109,7 +109,7 @@ func (action *DeleteUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action DeleteUser) Process(dB *DB) {}
+func (action DeleteUser) Process( /*dB *DB*/ ) {}
 
 func (u User) Read() DefinedAction {
 	return &ReadUser{}
@@ -121,7 +121,7 @@ func (action *ReadUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action ReadUser) Process(dB *DB) {}
+func (action ReadUser) Process( /*dB *DB*/ ) {}
 
 func (u User) Print() {
 	fmt.Printf("Name: %s, Password: %s, ID: %d, Email: %s, Room: %v", u.Username, u.Password, u.ID, u.Email)

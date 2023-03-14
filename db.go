@@ -9,18 +9,19 @@ import (
 var db *sql.DB
 var logined bool
 var FirstFreeID int = 0
-var dB *DB
 
-type DB []GeneralObject
+//var dB *DB
 
-func (db DB) GetIndex(id string) int {
+//type DB []GeneralObject
+
+/*func (db DB) GetIndex(id string) int {
 	for i, v := range db {
 		if v.GetID() == id {
 			return i
 		}
 	}
 	return -1
-}
+}*/
 
 func cfg() {
 	cfg := mysql.NewConfig()

@@ -9,7 +9,7 @@ package main
 
 type DefinedAction interface {
 	GetFromJSON([]byte)
-	Process(dB *DB)
+	Process( /*dB *DB*/ )
 }
 
 type GeneralObject interface {

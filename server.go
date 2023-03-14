@@ -28,7 +28,7 @@ func handleConnection(conn net.Conn) {
 		n, err := conn.Read(buf)
 		if string(buf[:n]) == "/::login" {
 			n, _ = conn.Read(buf)
-			dB.RecAction(buf[:n])
+			RecAction(buf[:n])
 			if logined == false {
 				conn.Write([]byte("|::failed"))
 			}
@@ -55,7 +55,7 @@ func sendToConnection(conn net.Conn) {
 	}
 }
 
-func (dB *DB) RecAction(text []byte) {
+func RecAction(text []byte) {
 	logined = false
 	var action Action
 	err := json.Unmarshal(text, &action)
@@ -91,5 +91,5 @@ func (dB *DB) RecAction(text []byte) {
 		return
 	}
 	defact.GetFromJSON(text)
-	defact.Process(dB)
+	defact.Process()
 }
