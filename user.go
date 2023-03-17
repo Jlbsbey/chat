@@ -9,7 +9,7 @@ import (
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	ID       string `json:"id"`
+	ID       int    `json:"id"`
 	Email    string `json:"email"`
 }
 
@@ -36,6 +36,7 @@ type LoginUser struct {
 		Password string `json:"password"`
 		Email    string `json:"email"`
 		ID       string `json:"id"`
+		Login    bool   `json:"login"`
 	} `json:"data"`
 }
 
@@ -64,7 +65,6 @@ func (action LoginUser) Process() {
 		}
 		if login == action.Data.Username && passw == action.Data.Password {
 			logined = true
-			fmt.Println("Login successful")
 			return
 		}
 		if err != nil {
@@ -72,9 +72,9 @@ func (action LoginUser) Process() {
 			return
 		}
 	}
-	fmt.Println("Login failed")
 	return
 }
+
 func (u User) Create() DefinedAction {
 	return &CreateUser{}
 }
@@ -85,7 +85,12 @@ func (action *CreateUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action CreateUser) Process() {}
+func (action CreateUser) Process() {
+	fmt.Println(action.U.Username)
+	fmt.Println(action.U.Password)
+	fmt.Println(action.U.Email)
+	fmt.Println(first_id())
+}
 
 func (u User) Edit() DefinedAction {
 	return &EditUser{}
@@ -126,6 +131,17 @@ func (action ReadUser) Process() {}
 func (u User) Print() {
 	fmt.Printf("Name: %s, Password: %s, ID: %d, Email: %s, Room: %v", u.Username, u.Password, u.ID, u.Email)
 }
-func (u User) GetID() string {
+func (u User) GetID() int {
 	return u.ID
+}
+
+func first_id() int {
+	var next_id int
+	query := `SELECT MIN(ID+1) AS next_id FROM users WHERE ID+1 NOT IN (SELECT ID FROM users)`
+	err := db.QueryRow(query).Scan(&next_id)
+	if err != nil {
+		fmt.Println(err)
+		return 0
+	}
+	return next_id
 }

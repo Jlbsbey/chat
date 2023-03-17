@@ -17,7 +17,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		handleConnection(conn)
+		go handleConnection(conn)
 	}
 }
 
@@ -26,15 +26,20 @@ func handleConnection(conn net.Conn) {
 	buf := make([]byte, 1024)
 	for {
 		n, err := conn.Read(buf)
-		if string(buf[:n]) == "/::login" {
+		switch string(buf[:n]) {
+		case "/::login":
 			n, _ = conn.Read(buf)
 			RecAction(buf[:n])
 			if logined == false {
-				conn.Write([]byte("|::failed"))
+				return
+				response("user", "login", "fail", conn)
+			} else {
+				response("user", "login", "succ", conn)
 			}
-		} else if string(buf[:n]) == "/::create" {
-
-		} else {
+		case "/::create":
+			n, _ = conn.Read(buf)
+			RecAction(buf[:n])
+		default:
 			fmt.Println(string(buf[:n]))
 		}
 		if err != nil {
@@ -72,18 +77,16 @@ func RecAction(text []byte) {
 	default:
 		fmt.Println("Unknown object", action.ObjName)
 	}
-
 	var defact DefinedAction
-
 	switch action.Action {
 	case "create":
-		obj.Create()
+		defact = obj.Create()
 	case "edit":
-		obj.Edit()
+		defact = obj.Edit()
 	case "delete":
-		obj.Delete()
+		defact = obj.Delete()
 	case "read":
-		obj.Read()
+		defact = obj.Read()
 	case "login":
 		defact = obj.Login()
 	default:
@@ -92,4 +95,9 @@ func RecAction(text []byte) {
 	}
 	defact.GetFromJSON(text)
 	defact.Process()
+
+}
+
+func response(obj string, act string, state string, conn net.Conn) {
+	conn.Write([]byte("|::" + obj + "_::_" + act + "_::_" + state))
 }

@@ -12,5 +12,5 @@ type GeneralObject interface {
 	Read() DefinedAction
 	Login() DefinedAction
 	Print()
-	GetID() string
+	GetID() int
 }

@@ -29,10 +29,15 @@ func handleConnections(conn net.Conn) {
 		if err != nil {
 			panic(err)
 		}
-		if string(buf[:n]) == "|::failed" {
+		switch string(buf[:n]) {
+		case "|::user_::_login_::_fail":
+			fmt.Println("Login failed")
 			return
+		case "|::user_::_login_::_succ":
+			fmt.Println("Login successful")
+		default:
+			fmt.Println(string(buf[:n]))
 		}
-		fmt.Println(string(buf[:n]))
 	}
 }
 
@@ -73,13 +78,15 @@ func login(conn net.Conn) {
 }
 
 func create(conn net.Conn) {
-	var username string
-	var password string
+	var username, password, email string
+	conn.Write([]byte("/::create"))
 	fmt.Print("Write a login: ")
 	fmt.Scan(&username)
 	fmt.Print("Write a password: ")
 	fmt.Scan(&password)
-	u, err := json.Marshal(Action{Action: "create", ObjName: "user", Data: User{Username: username, Password: password}})
+	fmt.Print("Write a email(optional, leave empty if do not want to write it): ")
+	fmt.Scan(&email)
+	u, err := json.Marshal(Action{Action: "create", ObjName: "user", Data: User{Username: username, Password: password, Email: email}})
 	if err != nil {
 		panic(err)
 	}
