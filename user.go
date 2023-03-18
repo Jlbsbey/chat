@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 )
 
 type User struct {
@@ -40,6 +42,8 @@ type LoginUser struct {
 	} `json:"data"`
 }
 
+var sessions = make(map[uint64]int)
+
 func (u User) Login() DefinedAction {
 	return &LoginUser{}
 }
@@ -50,32 +54,43 @@ func (action *LoginUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action LoginUser) Process() {
+func (action LoginUser) Process() []byte {
 	us := `SELECT Login, Password FROM users WHERE Login = ? AND Password = ?`
 
 	lg, err := db.Query(us, action.Data.Username, action.Data.Password)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 	var login, passw string
+	var ID int
 	for lg.Next() {
 		if err = lg.Scan(&login, &passw); err != nil {
 			log.Println(err)
 		}
 		if login == action.Data.Username && passw == action.Data.Password {
 			logined = true
-			return
+			us = `SELECT ID, Login FROM users WHERE Login = ?`
+			lg, err = db.Query(us, action.Data.Username)
+			if err != nil {
+				panic(err)
+			}
+			lg.Scan(&ID)
+			ses_id := CreateSession(ID)
+			response, err := json.Marshal(Response{Session_ID: ses_id, Action: "login", Success: true, ObjName: "user"})
+			if err != nil {
+				panic(err)
+			}
+			return response
 		}
 		if err != nil {
-			fmt.Println(err)
-			return
+			panic(err)
 		}
 	}
-	return
+	response, err := json.Marshal(Response{Action: "login", Success: false, ObjName: "user"})
+	return response
 }
 
-func (u User) Create() DefinedAction {
+/*func (u User) Create() DefinedAction {
 	return &CreateUser{}
 }
 func (action *CreateUser) GetFromJSON(rawData []byte) {
@@ -133,7 +148,7 @@ func (u User) Print() {
 }
 func (u User) GetID() int {
 	return u.ID
-}
+}*/
 
 func first_id() int {
 	var next_id int
@@ -144,4 +159,24 @@ func first_id() int {
 		return 0
 	}
 	return next_id
+}
+
+func CreateSession(us_id int) uint64 {
+	var id uint64
+	var free bool
+	free = false
+	var max, min int
+	max = 1000000000000000
+	min = 100000000000000
+	for free == false {
+		rand.Seed(time.Now().UnixNano())
+		id = uint64(rand.Intn(max-min) + min)
+		if _, ok := sessions[id]; !ok {
+			free = true
+		}
+	}
+	sessions[id] = us_id
+	fmt.Println(us_id)
+	fmt.Println(id)
+	return id
 }

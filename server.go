@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net"
 )
@@ -60,44 +59,7 @@ func sendToConnection(conn net.Conn) {
 	}
 }
 
-func RecAction(text []byte) {
-	logined = false
-	var action Action
-	err := json.Unmarshal(text, &action)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var obj GeneralObject
-	switch action.ObjName {
-	case "user":
-		obj = &User{}
-	/*case "room":
-	obj = &Room{}*/
-	default:
-		fmt.Println("Unknown object", action.ObjName)
-	}
-	var defact DefinedAction
-	switch action.Action {
-	case "create":
-		defact = obj.Create()
-	case "edit":
-		defact = obj.Edit()
-	case "delete":
-		defact = obj.Delete()
-	case "read":
-		defact = obj.Read()
-	case "login":
-		defact = obj.Login()
-	default:
-		fmt.Println("Unknown action", action.Action)
-		return
-	}
-	defact.GetFromJSON(text)
-	defact.Process()
-
-}
-
 func response(obj string, act string, state string, conn net.Conn) {
+	fmt.Println("|::" + obj + "_::_" + act + "_::_" + state)
 	conn.Write([]byte("|::" + obj + "_::_" + act + "_::_" + state))
 }
