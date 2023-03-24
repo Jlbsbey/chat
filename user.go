@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -90,7 +91,7 @@ func (action LoginUser) Process() []byte {
 	return response
 }
 
-/*func (u User) Create() DefinedAction {
+func (u User) Create() DefinedAction {
 	return &CreateUser{}
 }
 func (action *CreateUser) GetFromJSON(rawData []byte) {
@@ -100,14 +101,26 @@ func (action *CreateUser) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-func (action CreateUser) Process() {
-	fmt.Println(action.U.Username)
-	fmt.Println(action.U.Password)
-	fmt.Println(action.U.Email)
-	fmt.Println(first_id())
+func (action CreateUser) Process() []byte {
+	quer := `INSERT INTO users(Login, Password, Email) VALUES (?, ?, ?)`
+	_, err := db.ExecContext(context.Background(), quer, action.U.Username, action.U.Password, action.U.Email)
+	if err != nil {
+		response, err := json.Marshal(Response{Action: "create", Success: false, ObjName: "user"})
+		if err != nil {
+			panic(err)
+		}
+		return response
+	} else {
+		response, err := json.Marshal(Response{Action: "create", Success: true, ObjName: "user"})
+		if err != nil {
+			panic(err)
+		}
+
+		return response
+	}
 }
 
-func (u User) Edit() DefinedAction {
+/*func (u User) Edit() DefinedAction {
 	return &EditUser{}
 }
 func (action *EditUser) GetFromJSON(rawData []byte) {

@@ -6,7 +6,7 @@ type DefinedAction interface {
 }
 
 type GeneralObject interface {
-	//Create() DefinedAction
+	Create() DefinedAction
 	//Edit() DefinedAction
 	//Delete() DefinedAction
 	//Read() DefinedAction

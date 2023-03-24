@@ -50,7 +50,7 @@ func RecAction(text []byte) []byte {
 	var defact DefinedAction
 	switch action.Action {
 	case "create":
-		//defact = obj.Create()
+		defact = obj.Create()
 	case "edit":
 		//defact = obj.Edit()
 	case "delete":
