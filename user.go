@@ -72,12 +72,16 @@ func (action LoginUser) Process() []byte {
 			logined = true
 			us = `SELECT ID, Login FROM users WHERE Login = ?`
 			lg, err = db.Query(us, action.Data.Username)
+			for lg.Next() {
+				if err = lg.Scan(&ID, &login); err != nil {
+					log.Println(err)
+				}
+			}
 			if err != nil {
 				panic(err)
 			}
-			lg.Scan(&ID)
 			ses_id := CreateSession(ID)
-			response, err := json.Marshal(Response{Session_ID: ses_id, Action: "login", Success: true, ObjName: "user"})
+			response, err := json.Marshal(Response{Session_ID: ses_id, Action: "login", Success: true, ObjName: "user", User_ID: ID})
 			if err != nil {
 				panic(err)
 			}
@@ -163,17 +167,6 @@ func (u User) GetID() int {
 	return u.ID
 }*/
 
-func first_id() int {
-	var next_id int
-	query := `SELECT MIN(ID+1) AS next_id FROM users WHERE ID+1 NOT IN (SELECT ID FROM users)`
-	err := db.QueryRow(query).Scan(&next_id)
-	if err != nil {
-		fmt.Println(err)
-		return 0
-	}
-	return next_id
-}
-
 func CreateSession(us_id int) uint64 {
 	var id uint64
 	var free bool
@@ -189,7 +182,5 @@ func CreateSession(us_id int) uint64 {
 		}
 	}
 	sessions[id] = us_id
-	fmt.Println(us_id)
-	fmt.Println(id)
 	return id
 }

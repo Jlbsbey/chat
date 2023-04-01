@@ -11,4 +11,5 @@ type Response struct {
 	ObjName    string `json:"object"`
 	Action     string `json:"action"`
 	Success    bool   `json:"success"`
+	User_ID    int    `json:"user_id"`
 }

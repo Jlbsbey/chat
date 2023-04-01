@@ -19,8 +19,9 @@ import RoomList from './Rooms/RoomList';
 import ChatScreen from './Chat/ChatScreen';
 import LoginDialog from './LoginDialog';
 
-const drawerWidth = 240;
+const drawerWidth = 0.2*window.innerWidth;
 const backendIP = "http://localhost:8080"
+
 
 let testRoom = {
     Name: "Test room 1",
@@ -86,9 +87,12 @@ const emptyRoom = {
     //...
 }
 
+
 export default function MainScreen() {
+    const [activeSession, setSession]=React.useState(0)
     const [roomList, setRoomList] = React.useState([]);
     const [activeRoom, setActiveRoom] = React.useState(emptyRoom);
+
 
     function updateRoomList() {
         setRoomList([testRoom, testRoom2, testRoom3]);
@@ -140,6 +144,7 @@ export default function MainScreen() {
                         }}
                     >
                     <MenuItem onClick={handleClose}>Settings</MenuItem>
+                    <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession}/>
                     <MenuItem onClick={handleClose}>Logout</MenuItem>
                     </Menu>
                 </Toolbar>

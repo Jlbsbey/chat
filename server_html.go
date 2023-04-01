@@ -9,7 +9,13 @@ import (
 
 func Handler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if req.Method == "GET" {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, X-Auth-Token")
+	if req.Method == "OPTIONS" {
+		w.WriteHeader(204)
+	} else if req.Method == "GET" {
 
 	} else if req.Method == "POST" {
 		data, err := io.ReadAll(req.Body)
@@ -46,6 +52,7 @@ func RecAction(text []byte) []byte {
 	obj = &Room{}*/
 	default:
 		fmt.Println("Unknown object", action.ObjName)
+
 	}
 	var defact DefinedAction
 	switch action.Action {

@@ -12,6 +12,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 //Other imports
 import PropTypes from 'prop-types';
+import MenuItem from '@mui/material/MenuItem';
 
 //Local imports
 
@@ -44,11 +45,11 @@ export default function LoginDialog(props) {
 
 	function handleLogin() {
 		let actn = {
-			Action: "login",
-			ObjName: "User",
-			User: {
-				Username: login,
-				Password: password,
+			action: "login",
+			object: "user",
+			data: {
+				username: login,
+				password: password,
 			},
 		}
 
@@ -72,20 +73,22 @@ export default function LoginDialog(props) {
 
 			return resp.json()
 		}).then(data => {
-			//The place where you read json data from server
-
-			console.log(data);
-			//if (data.Success == ...)
+			//console.log(data);
+			if (data.success == true){
+				props.setSession(data.session_id);
+				alert("Login successfull");
 			setLoginDone(true);
 			setOpen(false);
+			}
 		});
 	}
 
 	return (
 		<>
-			<Button variant="standard" onClick={handleClickOpen}>
+			{/*<Button variant="standard" onClick={handleClickOpen}>
 				Login
-			</Button>
+			</Button>*/}
+			<MenuItem onClick={handleClickOpen}>Login</MenuItem>
 			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>Login</DialogTitle>
 				<DialogContent>
