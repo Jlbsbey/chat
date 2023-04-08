@@ -15,6 +15,7 @@ import PropTypes from 'prop-types';
 import MenuItem from '@mui/material/MenuItem';
 
 //Local imports
+import Register from './Register';
 
 
 export default function LoginDialog(props) {
@@ -116,6 +117,7 @@ export default function LoginDialog(props) {
 					/>
 				</DialogContent>
 				<DialogActions>
+					<Register backendIP={props.backendIP} />
 					<Button onClick={handleCancel}>Cancel</Button>
 					<Button onClick={handleLogin}>Login</Button>
 				</DialogActions>

@@ -17,19 +17,15 @@ import PropTypes from 'prop-types';
 import MessageListItem from './MessageListItem';
 
 export default function ChatScreen(props) {
+    const [messageAuthor, setAuthor] = React.useState("")
     const [userText, setUserText] = React.useState("");
 
     function userTextChange(event) {
         setUserText(event.target.value);
     }
-
     function sendMessage(event) {
-        //alert("Sending: ".concat(userText)); 
         let temp = props.activeRoom;
-        temp.Messages.push({Text: userText, Author:"aaaaa"});
-        props.setActiveRoom(temp);
-        //place for fetch: action create message 
-        //...
+        //отправить сообщение на сервер и загрузить сообщение обратно С АВТОРОМ
 
         setUserText("");
     }

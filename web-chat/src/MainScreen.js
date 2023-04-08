@@ -18,6 +18,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import RoomList from './Rooms/RoomList';
 import ChatScreen from './Chat/ChatScreen';
 import LoginDialog from './LoginDialog';
+import AddRoom from './Rooms/AddRoom'
 
 const drawerWidth = 0.2*window.innerWidth;
 const backendIP = "http://localhost:8080"
@@ -161,10 +162,11 @@ export default function MainScreen() {
             >
                 <Toolbar />
                 <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList}/>
+                <AddRoom backendIP={backendIP}/>
             </Drawer>
 
             {/*This is the window with the chat*/}
-            <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom}/>
+            <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP}/>
         </Box>
     );
 }

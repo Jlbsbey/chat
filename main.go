@@ -9,7 +9,7 @@ type GeneralObject interface {
 	Create() DefinedAction
 	//Edit() DefinedAction
 	//Delete() DefinedAction
-	//Read() DefinedAction
+	Read() DefinedAction
 	Login() DefinedAction
 	//Print()
 	//GetID() int

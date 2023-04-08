@@ -56,14 +56,14 @@ func RecAction(text []byte) []byte {
 	}
 	var defact DefinedAction
 	switch action.Action {
-	case "create":
+	case "register":
 		defact = obj.Create()
 	case "edit":
 		//defact = obj.Edit()
 	case "delete":
 		//defact = obj.Delete()
 	case "read":
-		//defact = obj.Read()
+		defact = obj.Read()
 	case "login":
 		defact = obj.Login()
 	default:
