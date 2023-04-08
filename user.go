@@ -179,6 +179,7 @@ func (action *ReadUser) GetFromJSON(rawData []byte) {
 func (action ReadUser) Process() []byte {
 	var login, email string
 	userID := sessions[action.Data.Session_ID]
+	fmt.Println(userID)
 	readQuery := `SELECT ID, Login, Email FROM users WHERE ID = ?`
 	rows, err := db.Query(readQuery, userID)
 	for rows.Next() {
@@ -193,6 +194,7 @@ func (action ReadUser) Process() []byte {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(5)
 	return response
 
 }

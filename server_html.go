@@ -48,8 +48,8 @@ func RecAction(text []byte) []byte {
 	switch action.ObjName {
 	case "user":
 		obj = &User{}
-	/*case "room":
-	obj = &Room{}*/
+	case "room":
+		obj = &Room{}
 	default:
 		fmt.Println("Unknown object", action.ObjName)
 

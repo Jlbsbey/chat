@@ -90,6 +90,7 @@ const emptyRoom = {
 
 
 export default function MainScreen() {
+    //
     const [activeSession, setSession]=React.useState(0)
     const [roomList, setRoomList] = React.useState([]);
     const [activeRoom, setActiveRoom] = React.useState(emptyRoom);
@@ -123,7 +124,7 @@ export default function MainScreen() {
                 <Toolbar>
                     
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        The Go Chat: {activeRoom.Name}
+                        The Go Chat: {activeSession}
                     </Typography>
                         <ListItemAvatar onClick={handleClick} > 
                         <Avatar alt="User avatar" src="/folder/image.jpg" />
@@ -162,7 +163,7 @@ export default function MainScreen() {
             >
                 <Toolbar />
                 <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList}/>
-                <AddRoom backendIP={backendIP}/>
+                <AddRoom backendIP={backendIP} activeSession={activeSession} setSession={setSession}/>
             </Drawer>
 
             {/*This is the window with the chat*/}
