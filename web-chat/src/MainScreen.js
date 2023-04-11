@@ -92,6 +92,9 @@ const emptyRoom = {
 export default function MainScreen() {
     //
     const [activeSession, setSession]=React.useState(0)
+    const [userID, setUserID]=React.useState(0)
+    const [userName, setUserName]=React.useState("")
+    const [email, setEmail]=React.useState("")
     const [roomList, setRoomList] = React.useState([]);
     const [activeRoom, setActiveRoom] = React.useState(emptyRoom);
 
@@ -124,7 +127,7 @@ export default function MainScreen() {
                 <Toolbar>
                     
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        The Go Chat: {activeSession}
+                        The Go Chat: {activeSession}, {userID}, {userName}, {email}
                     </Typography>
                         <ListItemAvatar onClick={handleClick} > 
                         <Avatar alt="User avatar" src="/folder/image.jpg" />
@@ -146,7 +149,7 @@ export default function MainScreen() {
                         }}
                     >
                     <MenuItem onClick={handleClose}>Settings</MenuItem>
-                    <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession}/>
+                    <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession} userID={userID} setUserID={setUserID} userName={userName} setUserName={setUserName} email={email} setEmail={setEmail}/>
                     <MenuItem onClick={handleClose}>Logout</MenuItem>
                     </Menu>
                 </Toolbar>
@@ -163,7 +166,7 @@ export default function MainScreen() {
             >
                 <Toolbar />
                 <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList}/>
-                <AddRoom backendIP={backendIP} activeSession={activeSession} setSession={setSession}/>
+                <AddRoom backendIP={backendIP} activeSession={activeSession} setSession={setSession} userID={userID} setUserID={setUserID}/>
             </Drawer>
 
             {/*This is the window with the chat*/}

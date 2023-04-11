@@ -12,7 +12,7 @@ import (
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	ID       int    `json:"id"`
+	ID       int    `json:"user_id"`
 	Email    string `json:"email"`
 }
 
@@ -62,7 +62,7 @@ func (action LoginUser) Process() []byte {
 	if err != nil {
 		panic(err)
 	}
-	var login, passw string
+	var login, passw, email string
 	var ID int
 	for lg.Next() {
 		if err = lg.Scan(&login, &passw); err != nil {
@@ -70,10 +70,10 @@ func (action LoginUser) Process() []byte {
 		}
 		if login == action.Data.Username && passw == action.Data.Password {
 			logined = true
-			us = `SELECT ID, Login FROM users WHERE Login = ?`
+			us = `SELECT ID, Login, Email FROM users WHERE Login = ?`
 			lg, err = db.Query(us, action.Data.Username)
 			for lg.Next() {
-				if err = lg.Scan(&ID, &login); err != nil {
+				if err = lg.Scan(&ID, &login, &email); err != nil {
 					log.Println(err)
 				}
 			}
@@ -81,7 +81,7 @@ func (action LoginUser) Process() []byte {
 				panic(err)
 			}
 			ses_id := CreateSession(ID)
-			response, err := json.Marshal(Response{Session_ID: ses_id, Action: "login", Success: true, ObjName: "user", User_ID: ID})
+			response, err := json.Marshal(Response{Session_ID: ses_id, Action: "login", Success: true, ObjName: "user", Data: User{Username: login, ID: ID, Email: email}})
 			if err != nil {
 				panic(err)
 			}
@@ -190,7 +190,7 @@ func (action ReadUser) Process() []byte {
 	if err != nil {
 		panic(err)
 	}
-	response, err := json.Marshal(Response{Action: "read", ObjName: "user", Login: login, Email: email, User_ID: userID})
+	response, err := json.Marshal(Response{Action: "read", ObjName: "user", Data: User{Username: login, ID: userID, Email: email}})
 	if err != nil {
 		panic(err)
 	}

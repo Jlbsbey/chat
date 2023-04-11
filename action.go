@@ -7,12 +7,10 @@ type Action struct {
 }
 
 type Response struct {
-	Session_ID    uint64 `json:"session_id"`
-	ObjName       string `json:"object"`
-	Action        string `json:"action"`
-	Success       bool   `json:"success"`
-	User_ID       int    `json:"user_id"`
-	Login         string `json:"login"`
-	Email         string `json:"email"`
-	Error_message string `json:"error_Message"`
+	Session_ID    uint64      `json:"session_id"`
+	ObjName       string      `json:"object"`
+	Action        string      `json:"action"`
+	Success       bool        `json:"success"`
+	Error_message string      `json:"error_Message"`
+	Data          interface{} `json:"data"`
 }

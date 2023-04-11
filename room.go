@@ -9,7 +9,7 @@ import (
 type Room struct {
 	Name string `json:"name"`
 	//Messages   []Message `json:"messages"`
-	ID         string `json:"id"`
+	Room_ID    string `json:"room_id"`
 	InviteCode int    `json:"inv_code"`
 }
 
@@ -17,7 +17,7 @@ type LoginRoom struct {
 	Data struct {
 		Name       string `json:"name"`
 		ID         string `json:"id"`
-		InviteCode int    `json:"inv_code"`
+		InviteCode int    `json:"invite_code"`
 		User_ID    int    `json:"user_id"`
 	} `json:"data"`
 }
@@ -50,14 +50,18 @@ func (action *LoginRoom) GetFromJSON(rawData []byte) {
 	}
 }
 func (action LoginRoom) Process() []byte {
-	us := `SELECT Room_name, Invite_code FROM rooms WHERE Room_name = ? AND Invite_code = ?`
-
+	us := `SELECT Room_name, Invite_code FROM rooms WHERE Room_name = ? OR Invite_code = ?`
+	fmt.Println(action.Data.Name)
+	fmt.Println(action.Data.InviteCode)
+	fmt.Println(action.Data.User_ID)
 	lg, err := db.Query(us, action.Data.Name, action.Data.InviteCode)
+	fmt.Println(lg)
 	if err != nil {
 		panic(err)
 	}
 	var name string
-	var inv_c, ID int
+	var inv_c int
+	fmt.Println(3)
 	for lg.Next() {
 		if err = lg.Scan(&name, &inv_c); err != nil {
 			log.Println(err)
@@ -66,7 +70,7 @@ func (action LoginRoom) Process() []byte {
 		if name == action.Data.Name && inv_c == action.Data.InviteCode {
 			us = `INSERT INTO users_rooms(Rooms_id, User_id) VALUES (?, ?)`
 			lg, err = db.Query(us, action.Data.ID, action.Data.User_ID)
-			response, err := json.Marshal(Response{Action: "login", Success: true, ObjName: "room", User_ID: ID})
+			response, err := json.Marshal(Response{Action: "login", Success: true, ObjName: "room", Data: User{ID: action.Data.User_ID}})
 			if err != nil {
 				panic(err)
 			}
@@ -138,7 +142,5 @@ func (action *ReadRoom) GetFromJSON(rawData []byte) {
 
 func (action ReadRoom) Process() []byte { return nil }
 
-func (r Room) Print() {}
-func (r Room) GetID() string {
-	return r.ID
-}
+func (r Room) Print()        {}
+func (r Room) GetID() string { return "" }

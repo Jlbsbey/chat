@@ -77,6 +77,13 @@ export default function LoginDialog(props) {
 			//console.log(data);
 			if (data.success == true){
 				props.setSession(data.session_id);
+				props.setUserID(data.data.user_id);
+				props.setUserName(data.data.username);
+				if(props.email == ""){
+					props.setEmail("-");
+				} else if(props.email != ""){
+					props.setEmail(data.data.email);
+				}
 				alert("Login successfull");
 			setLoginDone(true);
 			setOpen(false);

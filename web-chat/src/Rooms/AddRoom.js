@@ -23,7 +23,6 @@ export default function AddRoom(props) {
 	const [loginDone, setLoginDone] = React.useState(false);
 	const [name, setName] = React.useState("");
 	const [inv_code, setCode] = React.useState(0);
-	const [user_id, setID] = React.useState(0);
 
 	function nameChange(event) {
 		setName(event.target.value);
@@ -46,48 +45,15 @@ export default function AddRoom(props) {
 	};
 
 	function handleLogin() {
-		let read = {
-			action: "read",
-			object: "user",
-			data:{
-				session_id: props.activeSession,
-			}
-		}
-		alert(props.activeSession)
-		//get user id
-		fetch(props.backendIP.concat("/"), {
-			method: 'POST', 
-			mode: 'cors', 
-			cache: 'no-cache', 
-			credentials: 'same-origin', 
-			headers: {
-			  	'Content-Type': 'application/json'
-			},
-			redirect: 'follow', 
-			referrerPolicy: 'no-referrer', 
-			body: JSON.stringify(read),
-		}).then(resp => {
-			//The place where you should check if request was successfull and read info about response like headers
-			if (!resp.ok) {alert("Error occured during login");}
-
-			return resp.json()
-		}).then(data => {
-			alert("ok")
-			setID(data.user_id);
-			setID(data.user_id);
-			setID(data.user_id);
-		});
-		alert(user_id)
 		let actn = {
 			action: "login",
 			object: "room",
 			data: {
 				name: name,
 				invite_code: inv_code,
-				user_id: user_id,
+				user_id: props.userID,
 			},
 		}
-
 		//add to room
 		fetch(props.backendIP.concat("/"), {
 			method: 'POST', 
@@ -108,7 +74,6 @@ export default function AddRoom(props) {
 
 			return resp.json()
 		}).then(data => {
-			alert(user_id)
 			if (data.success == true){
 				alert("Adding room was successfull");
 			//setLoginDone(true);
@@ -142,7 +107,7 @@ export default function AddRoom(props) {
 					<TextField
 						margin="dense"
 						label="Invite code"
-						type="email"
+						type="number"
 						fullWidth
 						variant="standard"
 						value={inv_code}
