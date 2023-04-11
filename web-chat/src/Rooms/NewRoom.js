@@ -20,7 +20,6 @@ export default function NewRoom(props) {
 	const [open, setOpen] = React.useState(false);
 	const [loginDone, setLoginDone] = React.useState(false);
 	const [name, setName] = React.useState("");
-	const [inv_code, setCode] = React.useState("");
 
 	function nameChange(event) {
 		setName(event.target.value);
@@ -45,6 +44,7 @@ export default function NewRoom(props) {
 			object: "room",
 			data: {
 				name: name,
+				user_id: props.userID,
 			},
 		}
 
@@ -70,8 +70,7 @@ export default function NewRoom(props) {
 		}).then(data => {
 			//console.log(data);
 			if (data.success == true){
-				props.setSession(data.session_id);
-				alert("Adding room was successfull");
+				alert("Creating room was successfull");
 			setLoginDone(true);
 			setOpen(false);
 			}

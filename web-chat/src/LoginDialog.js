@@ -85,6 +85,7 @@ export default function LoginDialog(props) {
 					props.setEmail(data.data.email);
 				}
 				alert("Login successfull");
+				
 			setLoginDone(true);
 			setOpen(false);
 			}

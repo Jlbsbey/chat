@@ -50,7 +50,7 @@ export default function AddRoom(props) {
 			object: "room",
 			data: {
 				name: name,
-				invite_code: inv_code,
+				invite_code: Number(inv_code),
 				user_id: props.userID,
 			},
 		}
@@ -115,7 +115,7 @@ export default function AddRoom(props) {
 					/>
 				</DialogContent>
 				<DialogActions>
-					<NewRoom backendIP={props.backendIP}/>
+					<NewRoom backendIP={props.backendIP} userID={props.userID} setUserID={props.setUserID}/>
 					<Button onClick={handleCancel}>Cancel</Button>
 					<Button onClick={handleLogin}>Add</Button>
 				</DialogActions>

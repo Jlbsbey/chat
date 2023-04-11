@@ -32,7 +32,7 @@ let testRoom = {
     ID: 1,
     //...
 }
-
+/*
 let testRoom2 = {
     Name: "Test room 2",
     Messages: [
@@ -79,7 +79,7 @@ let testRoom3 = {
     ],
     ID: 3,
     //...
-}
+}*/
 
 const emptyRoom = {
     Name: "",
@@ -100,9 +100,45 @@ export default function MainScreen() {
 
 
     function updateRoomList() {
-        setRoomList([testRoom, testRoom2, testRoom3]);
-        //place for fetch: action read room 
-        //...
+        setRoomList([]);
+        if(userID != 0){
+        let actn = {
+            action: "read",
+            object: "room",
+            data: {
+                user_id: userID,
+            }
+        }
+        fetch(backendIP.concat("/"), {
+			method: 'POST', 
+			mode: 'cors', 
+			cache: 'no-cache', 
+			credentials: 'same-origin', 
+			headers: {
+			  	'Content-Type': 'application/json'
+			},
+			redirect: 'follow', 
+			referrerPolicy: 'no-referrer', 
+			body: JSON.stringify(actn),
+		}).then(resp => {
+			if (!resp.ok) {
+				//alert("Error occured during login");
+			}
+
+			return resp.json()
+		}).then(data => {
+            console.log(data.data)
+			//setRoomList(data.data.name)
+            for(let i=0; i< data.data.Length; i++){
+                let room = {
+                    Name: data.data.name[i],
+                    Messages: [],
+                    ID: data.data.id[i],
+                }
+                setRoomList(roomList => [...roomList, room])
+            }
+		});
+    }
     }
 
     React.useEffect(() => {
@@ -127,7 +163,7 @@ export default function MainScreen() {
                 <Toolbar>
                     
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        The Go Chat: {activeSession}, {userID}, {userName}, {email}
+                        Not Telegram
                     </Typography>
                         <ListItemAvatar onClick={handleClick} > 
                         <Avatar alt="User avatar" src="/folder/image.jpg" />
