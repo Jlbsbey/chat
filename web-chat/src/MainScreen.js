@@ -88,7 +88,6 @@ const emptyRoom = {
     //...
 }
 
-
 export default function MainScreen() {
     //
     const [activeSession, setSession]=React.useState(0)
@@ -129,11 +128,11 @@ export default function MainScreen() {
 		}).then(data => {
             console.log(data.data)
 			//setRoomList(data.data.name)
-            for(let i=0; i< data.data.Length; i++){
+            for(let i=0; i< data.data.length; i++){
                 let room = {
-                    Name: data.data.name[i],
+                    Name: data.data[i].name,
                     Messages: [],
-                    ID: data.data.id[i],
+                    ID: data.data[i].room_id,
                 }
                 setRoomList(roomList => [...roomList, room])
             }
@@ -209,4 +208,7 @@ export default function MainScreen() {
             <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP}/>
         </Box>
     );
+    
 }
+
+

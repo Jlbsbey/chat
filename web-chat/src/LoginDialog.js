@@ -16,6 +16,7 @@ import MenuItem from '@mui/material/MenuItem';
 
 //Local imports
 import Register from './Register';
+import { updateRoomList } from './MainScreen';
 
 
 export default function LoginDialog(props) {
