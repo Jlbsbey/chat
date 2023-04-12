@@ -13,4 +13,5 @@ type GeneralObject interface {
 	Login() DefinedAction
 	//Print()
 	//GetID() int
+	Logout() DefinedAction
 }

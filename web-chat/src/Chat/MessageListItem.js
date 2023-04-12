@@ -30,15 +30,15 @@ export default function MessageListItem(props) {
         Message: PropTypes.any.isRequired,
     };
     return (
-        <ListItem key={props.Message.ID}>
+        <ListItem key={props.Message.message_id}>
             <ListItemButton >
                 <ListItemAvatar onContextMenu={handleClick} > 
                     <Avatar alt="User avatar" src="/folder/image.jpg" />
                 </ListItemAvatar>
                 <ListItemText 
                 disableTypography
-                primary={<Typography sx={{color: '#8888FF'}}> {props.Message.Author} </Typography>} 
-                secondary={<Typography> {props.Message.Text} </Typography>} 
+                primary={<Typography sx={{color: '#8888FF'}}> {props.Message.author} </Typography>} 
+                secondary={<Typography> {props.Message.Content.text} </Typography>} 
                 />
                 </ListItemButton>
                 <Menu

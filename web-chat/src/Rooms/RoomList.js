@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import RoomListItem from './RoomListItem';
 
 export default function RoomList(props) {
-    return (
+    return ( 
         <Box sx={{ overflow: 'auto' }}>
             <List>
                 <Divider/>

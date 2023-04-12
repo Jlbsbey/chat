@@ -14,6 +14,13 @@ type Room struct {
 	InviteCode int `json:"inv_code"`
 }
 
+type LogoutRoom struct {
+	Data struct {
+		Room_ID int `json:"room_id"`
+		User_ID int `json:"user_id"`
+	} `json:"data"`
+}
+
 type LoginRoom struct {
 	Data struct {
 		Name       string `json:"name"`
@@ -39,7 +46,7 @@ type ReadRoom struct {
 }
 type DeleteRoom struct {
 	Data struct {
-		ID string `json:"id"`
+		Room_ID string `json:"room_id"`
 	} `json:"data"`
 }
 
@@ -150,13 +157,54 @@ func (action *DeleteRoom) GetFromJSON(rawData []byte) {
 }
 
 func (action DeleteRoom) Process() []byte {
-	return nil
+	us := `DELETE FROM rooms WHERE ID = ?`
+	_, err := db.ExecContext(context.Background(), us, action.Data.Room_ID)
+	if err != nil {
+		panic(err)
+	}
+	us = `DELETE FROM users_rooms WHERE Room_id = ?`
+	_, err = db.ExecContext(context.Background(), us, action.Data.Room_ID)
+	if err != nil {
+		panic(err)
+	}
+	us = `DELETE FROM messages WHERE Room_id = ?`
+	_, err = db.ExecContext(context.Background(), us, action.Data.Room_ID)
+	if err != nil {
+		panic(err)
+	}
+	response, err := json.Marshal(Response{Action: "delete", Success: true, ObjName: "room"})
+	if err != nil {
+		panic(err)
+	}
+	return response
+}
+
+func (r Room) Logout() DefinedAction {
+	return &LogoutRoom{}
+}
+func (action *LogoutRoom) GetFromJSON(rawData []byte) {
+	err := json.Unmarshal(rawData, action)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+func (action LogoutRoom) Process() []byte {
+	us := `DELETE FROM users_rooms WHERE User_id = ?  AND Room_id = ?`
+	_, err := db.ExecContext(context.Background(), us, action.Data.User_ID, action.Data.Room_ID)
+	if err != nil {
+		panic(err)
+	}
+	response, err := json.Marshal(Response{Action: "logout", Success: true, ObjName: "room"})
+	if err != nil {
+		panic(err)
+	}
+	return response
 }
 
 func (r Room) Read() DefinedAction {
 	return &ReadRoom{}
 }
-
 func (action *ReadRoom) GetFromJSON(rawData []byte) {
 	err := json.Unmarshal(rawData, action)
 	if err != nil {
@@ -164,7 +212,6 @@ func (action *ReadRoom) GetFromJSON(rawData []byte) {
 		return
 	}
 }
-
 func (action ReadRoom) Process() []byte {
 	var Rooms []Room
 	us := `SELECT Room_id, Attributes FROM users_rooms WHERE User_id = ?`

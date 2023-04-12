@@ -12,7 +12,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 //Other imports
 import PropTypes from 'prop-types';
-import MenuItem from '@mui/material/MenuItem';
 
 export default function Register(props) {
     const [open, setOpen] = React.useState(false);
@@ -55,7 +54,6 @@ export default function Register(props) {
                 email: email,
 			},
 		}
-		//place for fetch: action login user
 		fetch(props.backendIP.concat("/"), {
 			method: 'POST', 
 			mode: 'cors', 
@@ -68,14 +66,12 @@ export default function Register(props) {
 			referrerPolicy: 'no-referrer', 
 			body: JSON.stringify(actn),
 		}).then(resp => {
-			//The place where you should check if request was successfull and read info about response like headers
 			if (!resp.ok) {
 				alert("Error occured during registration");
 			}
 
 			return resp.json()
 		}).then(data => {
-			//console.log(data);
 			if (data.success == true){
 				alert("Registration successfull, now login");
 			setRegisterDone(true);
@@ -87,9 +83,6 @@ export default function Register(props) {
     }
     return (
 		<>
-			{/*<Button variant="standard" onClick={handleClickOpen}>
-				Login
-			</Button>*/}
 			<Button variant="standard" onClick={handleClickOpen}>Register</Button>
 			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>Register</DialogTitle>

@@ -20,7 +20,13 @@ type CreateUser struct {
 	U User `json:"data"`
 }
 type EditUser struct {
-	U User `json:"data"`
+	Data struct {
+		Session_ID uint64 `json:"session_id"`
+		Username   string `json:"username"`
+		Password   string `json:"password"`
+		User_ID    int    `json:"user_id"`
+		Email      string `json:"email"`
+	}
 }
 type ReadUser struct {
 	Data struct {
@@ -29,8 +35,16 @@ type ReadUser struct {
 }
 type DeleteUser struct {
 	Data struct {
-		ID string `json:"id"`
+		Password   string `json:"password"`
+		Session_ID uint64 `json:"session_id"`
+		User_ID    int    `json:"user_id"`
 	} `json:"data"`
+}
+
+type LogoutUser struct {
+	Data struct {
+		Session_ID uint64 `json:"session_id"`
+	}
 }
 
 type LoginUser struct {
@@ -137,35 +151,109 @@ func (action CreateUser) Process() []byte {
 	}
 }
 
-/*
-	func (u User) Edit() DefinedAction {
-		return &EditUser{}
+func (u User) Edit() DefinedAction {
+	return &EditUser{}
+}
+func (action *EditUser) GetFromJSON(rawData []byte) {
+	err := json.Unmarshal(rawData, action)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+func (action EditUser) Process() []byte {
+	if sessions[action.Data.Session_ID] == action.Data.User_ID {
+		us := `UPDATE users SET Login = ?, Password = ?, Email = ? WHERE ID = ?`
+		_, err := db.ExecContext(context.Background(), us, action.Data.Username, action.Data.Password, action.Data.Email, sessions[action.Data.Session_ID])
+		if err != nil {
+			panic(err)
+		}
+		response, err := json.Marshal(Response{Action: "edit", Success: true, ObjName: "user"})
+		return response
+	} else {
+		response, err := json.Marshal(Response{Action: "edit", Success: false, ObjName: "user", Error_message: "Access denied"})
+		if err != nil {
+			panic(err)
+		}
+		return response
 	}
 
-	func (action *EditUser) GetFromJSON(rawData []byte) {
-		err := json.Unmarshal(rawData, action)
-		if err != nil {
-			fmt.Println(err)
-			return
+}
+
+func (u User) Delete() DefinedAction {
+	return &DeleteUser{}
+}
+func (action *DeleteUser) GetFromJSON(rawData []byte) {
+	err := json.Unmarshal(rawData, action)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+func (action DeleteUser) Process() []byte {
+	us := `SELECT Password FROM users WHERE ID = ?`
+	lg, err := db.Query(us, sessions[action.Data.Session_ID])
+	if err != nil {
+		panic(err)
+	}
+	var passw string
+	for lg.Next() {
+		if err = lg.Scan(&passw); err != nil {
+			log.Println(err)
+		}
+		if passw == action.Data.Password {
+			if sessions[action.Data.Session_ID] == action.Data.User_ID {
+				us = `DELETE FROM users WHERE ID = ?`
+				_, err := db.ExecContext(context.Background(), us, sessions[action.Data.Session_ID])
+				if err != nil {
+					panic(err)
+				}
+				us = `DELETE FROM users_rooms WHERE User_id = ?`
+				_, err = db.ExecContext(context.Background(), us, sessions[action.Data.Session_ID])
+				if err != nil {
+					panic(err)
+				}
+				us = `UPDATE messages SET Author_ID = ? WHERE Author_ID = ?`
+				_, err = db.ExecContext(context.Background(), us, -1, sessions[action.Data.Session_ID])
+				if err != nil {
+					panic(err)
+				}
+				response, err := json.Marshal(Response{Action: "delete", Success: true, ObjName: "user"})
+				return response
+			} else {
+				response, err := json.Marshal(Response{Action: "delete", Success: false, ObjName: "user", Error_message: "Access denied"})
+				if err != nil {
+					panic(err)
+				}
+				return response
+			}
+		} else {
+			response, err := json.Marshal(Response{Action: "delete", Success: false, ObjName: "user", Error_message: "Access denied"})
+			if err != nil {
+				panic(err)
+			}
+			return response
 		}
 	}
-
-func (action EditUser) Process() {}
-
-	func (u User) Delete() DefinedAction {
-		return &DeleteUser{}
+	response, err := json.Marshal(Response{Action: "delete", Success: false, ObjName: "user", Error_message: "Access denied"})
+	if err != nil {
+		panic(err)
 	}
+	return response
+}
 
-	func (action *DeleteUser) GetFromJSON(rawData []byte) {
-		err := json.Unmarshal(rawData, action)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+func (u User) Logout() DefinedAction {
+	return &LogoutUser{}
+}
+func (action *LogoutUser) GetFromJSON(rawData []byte) {
+	err := json.Unmarshal(rawData, action)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+}
+func (action LogoutUser) Process() []byte { return nil }
 
-func (action DeleteUser) Process() {}
-*/
 func (u User) Read() DefinedAction {
 	return &ReadUser{}
 }

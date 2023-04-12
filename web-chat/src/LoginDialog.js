@@ -20,7 +20,7 @@ import { updateRoomList } from './MainScreen';
 
 
 export default function LoginDialog(props) {
-	const [open, setOpen] = React.useState(false);
+	const [open, setOpen] = React.useState(true);
 	const [loginDone, setLoginDone] = React.useState(false);
 	const [login, setLogin] = React.useState("");
 	const [password, setPassword] = React.useState("");
@@ -85,20 +85,58 @@ export default function LoginDialog(props) {
 				} else if(props.email != ""){
 					props.setEmail(data.data.email);
 				}
-				alert("Login successfull");
-				
+			alert("Login successfull");
 			setLoginDone(true);
 			setOpen(false);
 			}
 		});
 	}
-
+	if(props.session == 0){
+		return (
+			<>
+				<Button variant="standard" onClick={handleClickOpen}>
+					Login
+				</Button>
+				<Dialog open={open} onClose={handleClose}>
+					<DialogTitle>Login</DialogTitle>
+					<DialogContent>
+						<DialogContentText>
+							Enter your credentials
+						</DialogContentText>
+						<TextField
+							autoFocus
+							margin="dense"
+							label="Email address"
+							type="email"
+							fullWidth
+							variant="standard"
+							value={login}
+							onChange={loginChange}
+						/>
+						<TextField
+							margin="dense"
+							label="Password"
+							type="password"
+							fullWidth
+							variant="standard"
+							value={password}
+							onChange={passwordChange}
+						/>
+					</DialogContent>
+					<DialogActions>
+						<Register backendIP={props.backendIP} />
+						<Button onClick={handleLogin}>Login</Button>
+					</DialogActions>
+				</Dialog>
+			</>
+		);
+	}else{
 	return (
 		<>
-			{/*<Button variant="standard" onClick={handleClickOpen}>
+			<Button variant="standard" onClick={handleClickOpen}>
 				Login
-			</Button>*/}
-			<MenuItem onClick={handleClickOpen}>Login</MenuItem>
+			</Button>
+			{/*<MenuItem onClick={handleClickOpen}>Login</MenuItem>*/}
 			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>Login</DialogTitle>
 				<DialogContent>
@@ -132,7 +170,7 @@ export default function LoginDialog(props) {
 				</DialogActions>
 			</Dialog>
 		</>
-	);
+	);}
 }
 
 LoginDialog.propTypes = {

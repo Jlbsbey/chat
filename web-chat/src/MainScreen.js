@@ -101,49 +101,42 @@ export default function MainScreen() {
     function updateRoomList() {
         setRoomList([]);
         if(userID != 0){
-        let actn = {
-            action: "read",
-            object: "room",
-            data: {
-                user_id: userID,
-            }
-        }
-        fetch(backendIP.concat("/"), {
-			method: 'POST', 
-			mode: 'cors', 
-			cache: 'no-cache', 
-			credentials: 'same-origin', 
-			headers: {
-			  	'Content-Type': 'application/json'
-			},
-			redirect: 'follow', 
-			referrerPolicy: 'no-referrer', 
-			body: JSON.stringify(actn),
-		}).then(resp => {
-			if (!resp.ok) {
-				//alert("Error occured during login");
-			}
-
-			return resp.json()
-		}).then(data => {
-            console.log(data.data)
-			//setRoomList(data.data.name)
-            for(let i=0; i< data.data.length; i++){
-                let room = {
-                    Name: data.data[i].name,
-                    Messages: [],
-                    ID: data.data[i].room_id,
+            let actn = {
+                action: "read",
+                object: "room",
+                data: {
+                    user_id: userID,
                 }
-                setRoomList(roomList => [...roomList, room])
             }
-		});
-    }
+            fetch(backendIP.concat("/"), {
+                method: 'POST', 
+                mode: 'cors', 
+                cache: 'no-cache', 
+                credentials: 'same-origin', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow', 
+                referrerPolicy: 'no-referrer', 
+                body: JSON.stringify(actn),
+            }).then(resp => {
+                if (!resp.ok) {}
+                return resp.json()
+            }).then(data => {
+                console.log(data.data)
+                for(let i=0; i< data.data.length; i++){
+                    let room = {
+                        Name: data.data[i].name,
+                        Messages: [],
+                        ID: data.data[i].room_id,
+                    }
+                setRoomList(roomList => [...roomList, room])
+                }
+            });
+        }
     }
 
-    React.useEffect(() => {
-        updateRoomList();
-    });
-
+    
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -153,7 +146,11 @@ export default function MainScreen() {
     const handleClose = () => {
     setAnchorEl(null);
     };
-
+    React.useEffect(() => {
+        updateRoomList();
+     });
+    if(activeSession== 0){
+     
     return (
         <Box sx={{ display: 'flex' }} height="100%">  {/*container for everything*/} 
 
@@ -164,29 +161,7 @@ export default function MainScreen() {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         Not Telegram
                     </Typography>
-                        <ListItemAvatar onClick={handleClick} > 
-                        <Avatar alt="User avatar" src="/folder/image.jpg" />
-                    </ListItemAvatar>
-                    
-                    <Menu
-                        id="demo-positioned-menu"
-                        aria-labelledby="demo-positioned-button"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                        }}
-                        transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                        }}
-                    >
-                    <MenuItem onClick={handleClose}>Settings</MenuItem>
                     <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession} userID={userID} setUserID={setUserID} userName={userName} setUserName={setUserName} email={email} setEmail={setEmail}/>
-                    <MenuItem onClick={handleClose}>Logout</MenuItem>
-                    </Menu>
                 </Toolbar>
             </AppBar>
 
@@ -207,7 +182,62 @@ export default function MainScreen() {
             {/*This is the window with the chat*/}
             <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP}/>
         </Box>
-    );
+    );} else if(activeSession!=0){
+        return (
+            <Box sx={{ display: 'flex' }} height="100%">  {/*container for everything*/} 
+    
+                {/*AppBar is the blue bar with the title on top*/}
+                <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                    <Toolbar>
+                        
+                        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+                            Not Telegram
+                        </Typography>
+                            <ListItemAvatar onClick={handleClick} > 
+                            <Avatar alt="User avatar" src="/folder/image.jpg" />
+                        </ListItemAvatar>
+                        
+                        <Menu
+                            id="demo-positioned-menu"
+                            aria-labelledby="demo-positioned-button"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                            }}
+                        >
+                        <MenuItem onClick={handleClose}>Settings</MenuItem>
+                        <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession} userID={userID} setUserID={setUserID} userName={userName} setUserName={setUserName} email={email} setEmail={setEmail}/>
+                        <MenuItem onClick={handleClose}>Logout</MenuItem>
+                        </Menu>
+                    </Toolbar>
+                </AppBar>
+    
+                {/*Drawer is that thing on the left side*/}
+                <Drawer
+                    variant="permanent"
+                    sx={{
+                        width: drawerWidth,
+                        flexShrink: 0,
+                        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+                    }}
+                >
+                    <Toolbar />
+                    <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList}/>
+                    <AddRoom backendIP={backendIP} activeSession={activeSession} setSession={setSession} userID={userID} setUserID={setUserID}/>
+                </Drawer>
+    
+                {/*This is the window with the chat*/}
+                <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP}/>
+            </Box>
+        );
+    }
     
 }
 

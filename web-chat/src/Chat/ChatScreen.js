@@ -19,13 +19,82 @@ import MessageListItem from './MessageListItem';
 export default function ChatScreen(props) {
     const [messageAuthor, setAuthor] = React.useState("")
     const [userText, setUserText] = React.useState("");
+    const [currentTime, setCurrentTime] = React.useState(new Date());
 
     function userTextChange(event) {
         setUserText(event.target.value);
     }
+    
     function sendMessage(event) {
-        let temp = props.activeRoom;
+        setCurrentTime(new Date());
+        let actn = {
+            action: "register",
+            object: "message",
+            data: {
+                room_id: props.activeRoom.ID,
+                author_id: props.userID,
+                Content:{
+                    text: userText,
+                },
+                date: currentTime,
+                is_forwarded: false, //placeholder
+                reply_message_id: 0, //placeholder
+
+
+            }
+        }
         //отправить сообщение на сервер и загрузить сообщение обратно С АВТОРОМ
+        fetch(props.backendIP.concat("/"), {
+			method: 'POST', 
+			mode: 'cors', 
+			cache: 'no-cache', 
+			credentials: 'same-origin', 
+			headers: {
+			  	'Content-Type': 'application/json'
+			},
+			redirect: 'follow', 
+			referrerPolicy: 'no-referrer', 
+			body: JSON.stringify(actn),
+		}).then(resp => {
+			//The place where you should check if request was successfull and read info about response like headers
+			if (!resp.ok) {
+				alert("Error occured during login");
+			}
+			return resp.json()
+		}).then(data => {
+            alert("aaaa")
+			let readmsg={
+                action: "read",
+                object: "message",
+                data: {
+                    message_id: data.data.message_id,
+                }
+            }
+
+            fetch(props.backendIP.concat("/"), {
+                method: 'POST', 
+                mode: 'cors', 
+                cache: 'no-cache', 
+                credentials: 'same-origin', 
+                headers: {
+                      'Content-Type': 'application/json'
+                },
+                redirect: 'follow', 
+                referrerPolicy: 'no-referrer', 
+                body: JSON.stringify(readmsg),
+            }).then(resp => {
+                //The place where you should check if request was successfull and read info about response like headers
+                if (!resp.ok) {
+                    alert("Error occured during login");
+                }
+                return resp.json()
+            }).then(data => {
+                props.activeRoom.Messages.push(data.data);
+                //props.setActiveRoom(props.activeRoom);
+                
+            });
+            
+		});
 
         setUserText("");
     }

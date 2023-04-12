@@ -50,6 +50,8 @@ func RecAction(text []byte) []byte {
 		obj = &User{}
 	case "room":
 		obj = &Room{}
+	case "message":
+		obj = &Message{}
 	default:
 		fmt.Println("Unknown object", action.ObjName)
 
@@ -65,7 +67,15 @@ func RecAction(text []byte) []byte {
 	case "read":
 		defact = obj.Read()
 	case "login":
+		if action.ObjName == "message" {
+			return []byte("")
+		}
 		defact = obj.Login()
+	case "logout":
+		if action.ObjName == "message" {
+			return []byte("")
+		}
+		defact = obj.Logout()
 	default:
 		panic("Unknown action")
 	}
