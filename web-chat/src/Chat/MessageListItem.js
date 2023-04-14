@@ -38,7 +38,7 @@ export default function MessageListItem(props) {
                 <ListItemText 
                 disableTypography
                 primary={<Typography sx={{color: '#8888FF'}}> {props.Message.author} </Typography>} 
-                secondary={<Typography> {props.Message.Content.text} </Typography>} 
+                secondary={<Typography> {props.Message.content.text} </Typography>} 
                 />
                 </ListItemButton>
                 <Menu

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -9,7 +10,7 @@ import (
 )
 
 type Message struct {
-	Cont        Content
+	Cont        Content   `json:"content"`
 	Message_ID  uint64    `json:"message_id"`
 	Room_ID     int       `json:"room_id"`
 	Author      int       `json:"author_id"`
@@ -24,7 +25,7 @@ type LoginMessage struct{}
 type LogoutMessage struct{}
 type CreateMessage struct {
 	Data struct {
-		Cont        Content
+		Cont        Content   `json:"content"`
 		Author      int       `json:"author_id"`
 		Room_ID     int       `json:"room_id"`
 		Reply       uint64    `json:"reply_message_id"`
@@ -38,6 +39,7 @@ type EditMessage struct {
 type ReadMessage struct {
 	Data struct {
 		Message_ID uint64 `json:"message_id"`
+		Room_ID    int    `json:"room_id"`
 	} `json:"data"`
 }
 type DeleteMessage struct {
@@ -92,8 +94,11 @@ func (action CreateMessage) Process() []byte {
 	if action.Data.IsForwarded == true {
 		Attributes[2] = '1'
 	}
-	us := `INSERT INTO messages (Message_id, Author_id, Room_id, Text, Creation_time, Attributes, ReplyToMesID) VALUES (?, ?, ?, ?, ?, ?, ?)`
-	_, err := db.ExecContext(context.Background(), us, MessageID, action.Data.Author, action.Data.Room_ID, action.Data.Cont.Text, action.Data.SendTime, Attributes, action.Data.Reply)
+	MsgText := []byte(action.Data.Cont.Text)
+	fmt.Println(action.Data.Cont.Text)
+	fmt.Println(MsgText)
+	us := `INSERT INTO messages (Message_ID, Author_ID, Room_ID, Text, Creation_time, Attributes, ReplyToMesID) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	_, err := db.ExecContext(context.Background(), us, MessageID, action.Data.Author, action.Data.Room_ID, MsgText, action.Data.SendTime, Attributes, action.Data.Reply)
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +140,7 @@ func (action DeleteMessage) Process() []byte {
 }
 
 func (m Message) Read() DefinedAction {
-	return &ReadRoom{}
+	return &ReadMessage{}
 }
 func (action *ReadMessage) GetFromJSON(rawData []byte) {
 	err := json.Unmarshal(rawData, action)
@@ -145,19 +150,28 @@ func (action *ReadMessage) GetFromJSON(rawData []byte) {
 	}
 }
 func (action ReadMessage) Process() []byte {
-	us := `SELECT Author_id, Room_id, Text, Creation_time, Attributes, ReplyToMesID FROM messages WHERE Message_id = ?`
-	rows, err := db.Query(us, action.Data.Message_ID)
+	us := `SELECT Author_ID, Room_ID, Text, Creation_time, Attributes, ReplyToMesID FROM messages WHERE Message_id = ? OR Room_ID = ?`
+
+	rows, err := db.Query(us, action.Data.Message_ID, action.Data.Room_ID)
 	if err != nil {
 		panic(err)
 	}
 	var Author_id, Room_id int
-	var Text string
 	var Creation_time time.Time
-	var Attributes string
+	var temptime []uint8
+	var Attributes, Text, Login, quer string
 	var IsForwarded bool
 	var ReplyToMesID uint64
+	var Messages []Message
+	var lg *sql.Rows
 	for rows.Next() {
-		err = rows.Scan(&Author_id, &Room_id, &Text, &Creation_time, &Attributes, &ReplyToMesID)
+		err = rows.Scan(&Author_id, &Room_id, &Text, &temptime, &Attributes, &ReplyToMesID)
+		fmt.Println(Text)
+		if err != nil {
+			panic(err)
+		}
+		datetimeStr := string(temptime)
+		Creation_time, err = time.Parse("2006-01-02 15:04:05", datetimeStr)
 		if err != nil {
 			panic(err)
 		}
@@ -166,30 +180,35 @@ func (action ReadMessage) Process() []byte {
 		} else {
 			IsForwarded = false
 		}
-		us = `SELECT Login FROM users WHERE ID = ?`
-		rows, err = db.Query(us, Author_id)
+		quer = `SELECT Login FROM users WHERE ID = ?`
+		lg, err = db.Query(quer, Author_id)
 		if err != nil {
 			panic(err)
 		}
-		var Login string
-		for rows.Next() {
-			err = rows.Scan(&Login)
+		for lg.Next() {
+			err = lg.Scan(&Login)
 			if err != nil {
 				panic(err)
 			}
-			response, err := json.Marshal(Response{Action: "read", Success: true, ObjName: "message", Data: Message{Message_ID: action.Data.Message_ID, Author: Author_id, Room_ID: Room_id, Cont: Content{Text: Text}, SendTime: Creation_time, IsForwarded: IsForwarded, Reply: ReplyToMesID, Username: Login}})
-			if err != nil {
-				panic(err)
-			}
-			return response
+			//append to array
+			Messages = append(Messages, Message{Message_ID: action.Data.Message_ID, Author: Author_id, Room_ID: Room_id, Cont: Content{Text: Text}, SendTime: Creation_time, IsForwarded: IsForwarded, Reply: ReplyToMesID, Username: Login})
+
 		}
 
 	}
-	response, err := json.Marshal(Response{Action: "read", Success: false, ObjName: "message", Error_message: "Message not found"})
-	if err != nil {
-		panic(err)
+	if len(Messages) == 0 {
+		response, err := json.Marshal(Response{Action: "read", Success: false, ObjName: "message", Error_message: "Message not found"})
+		if err != nil {
+			panic(err)
+		}
+		return response
+	} else {
+		response, err := json.Marshal(Response{Action: "read", Success: true, ObjName: "message", Data: Messages})
+		if err != nil {
+			panic(err)
+		}
+		return response
 	}
-	return response
 }
 
 func (m Message) Print()        {}
@@ -205,6 +224,14 @@ func CreateMessageID() uint64 {
 	for free == false {
 		rand.Seed(time.Now().UnixNano())
 		MessageID = uint64(rand.Intn(max-min) + min)
+		us := `SELECT Message_ID FROM messages WHERE Message_ID = ?`
+		rows, err := db.Query(us, MessageID)
+		if err != nil {
+			panic(err)
+		}
+		if rows.Next() == false {
+			free = true
+		}
 	}
 	return MessageID
 }

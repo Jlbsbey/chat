@@ -24,7 +24,7 @@ const drawerWidth = 0.2*window.innerWidth;
 const backendIP = "http://localhost:8080"
 
 
-let testRoom = {
+/*let testRoom = {
     Name: "Test room 1",
     Messages: [
         
@@ -32,7 +32,7 @@ let testRoom = {
     ID: 1,
     //...
 }
-/*
+
 let testRoom2 = {
     Name: "Test room 2",
     Messages: [
@@ -45,41 +45,7 @@ let testRoom2 = {
     //...
 }
 
-let testRoom3 = {
-    Name: "Test room 3",
-    Messages: [
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-        {Text: "Foo", Author: "TheUser1"},
-        {Text: "Bar", Author: "TheUser2"},
-        {Text: "FooBar", Author: "TheUser1"},
-        {Text: "BarFoo", Author: "TheUser2"},
-    ],
-    ID: 3,
-    //...
-}*/
+*/
 
 const emptyRoom = {
     Name: "",
@@ -148,10 +114,9 @@ export default function MainScreen() {
     };
     React.useEffect(() => {
         updateRoomList();
-     });
-    if(activeSession== 0){
-     
+    }, [userID]);
     return (
+        
         <Box sx={{ display: 'flex' }} height="100%">  {/*container for everything*/} 
 
             {/*AppBar is the blue bar with the title on top*/}
@@ -161,7 +126,33 @@ export default function MainScreen() {
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         Not Telegram
                     </Typography>
+                    {activeSession!=0?
+                        <><ListItemAvatar onClick={handleClick}>
+                            <Avatar alt="User avatar" src="/folder/image.jpg" />
+                        </ListItemAvatar><Menu
+                            id="demo-positioned-menu"
+                            aria-labelledby="demo-positioned-button"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                        >
+                                <MenuItem onClick={handleClose}>Settings</MenuItem>
+                                <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession} userID={userID} setUserID={setUserID} userName={userName} setUserName={setUserName} email={email} setEmail={setEmail} />
+                                <MenuItem onClick={handleClose}>Logout</MenuItem>
+                            </Menu></>
+                        :""}
+                    {activeSession==0?
                     <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession} userID={userID} setUserID={setUserID} userName={userName} setUserName={setUserName} email={email} setEmail={setEmail}/>
+                    :""}
+                    
                 </Toolbar>
             </AppBar>
 
@@ -175,70 +166,14 @@ export default function MainScreen() {
                 }}
             >
                 <Toolbar />
-                <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList}/>
+                <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList} backendIP={backendIP}/>
                 <AddRoom backendIP={backendIP} activeSession={activeSession} setSession={setSession} userID={userID} setUserID={setUserID}/>
             </Drawer>
 
             {/*This is the window with the chat*/}
-            <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP}/>
+            <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP} userID={userID} setUserID={setUserID}/>
         </Box>
-    );} else if(activeSession!=0){
-        return (
-            <Box sx={{ display: 'flex' }} height="100%">  {/*container for everything*/} 
-    
-                {/*AppBar is the blue bar with the title on top*/}
-                <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-                    <Toolbar>
-                        
-                        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                            Not Telegram
-                        </Typography>
-                            <ListItemAvatar onClick={handleClick} > 
-                            <Avatar alt="User avatar" src="/folder/image.jpg" />
-                        </ListItemAvatar>
-                        
-                        <Menu
-                            id="demo-positioned-menu"
-                            aria-labelledby="demo-positioned-button"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                            }}
-                            transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                            }}
-                        >
-                        <MenuItem onClick={handleClose}>Settings</MenuItem>
-                        <LoginDialog backendIP={backendIP} session={activeSession} setSession={setSession} userID={userID} setUserID={setUserID} userName={userName} setUserName={setUserName} email={email} setEmail={setEmail}/>
-                        <MenuItem onClick={handleClose}>Logout</MenuItem>
-                        </Menu>
-                    </Toolbar>
-                </AppBar>
-    
-                {/*Drawer is that thing on the left side*/}
-                <Drawer
-                    variant="permanent"
-                    sx={{
-                        width: drawerWidth,
-                        flexShrink: 0,
-                        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-                    }}
-                >
-                    <Toolbar />
-                    <RoomList activeRoom={activeRoom} setActiveRoom={setActiveRoom} roomList={roomList}/>
-                    <AddRoom backendIP={backendIP} activeSession={activeSession} setSession={setSession} userID={userID} setUserID={setUserID}/>
-                </Drawer>
-    
-                {/*This is the window with the chat*/}
-                <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP}/>
-            </Box>
-        );
+    );
     }
+
     
-}
-
-

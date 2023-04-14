@@ -19,7 +19,7 @@ export default function RoomList(props) {
                 <Divider/>
                 {props.roomList.map((Room, index) => (
                     <>
-                        <RoomListItem Room={Room} activeRoom={props.activeRoom} setActiveRoom={props.setActiveRoom}/>
+                        <RoomListItem Room={Room} activeRoom={props.activeRoom} setActiveRoom={props.setActiveRoom} backendIP={props.backendIP}/>
                         <Divider/>
                     </>
                 ))}
