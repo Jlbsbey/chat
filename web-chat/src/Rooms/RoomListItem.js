@@ -41,26 +41,24 @@ export default function RoomListItem(props) {
             return resp.json()
         }).then(data => {
             let msg={
-            author_id: "",
-            content:{
-                text: "",
-            },
-            date: Date,
-            is_forwarded: false, //placeholder
-            reply_message_id: 0, //placeholder
-            author: "",
-            }
+                author_id: "",
+                content:{
+                    text: "",
+                },
+                date: Date,
+                is_forwarded: false, //placeholder
+                reply_message_id: 0, //placeholder
+                author: "",
+                }
             for(let i=0; i< data.data.length; i++){
-            msg.author_id = data.data[i].author_id;
-            msg.content.text = data.data[i].content.text;
-            msg.date = data.data[i].date;
-            msg.author = data.data[i].author;
-            msg.is_forwarded=false;
-            msg.reply_message_id=0;
+                msg.author_id = data.data[i].author_id;
+                msg.content.text = data.data[i].content.text;
+                msg.date = data.data[i].date;
+                msg.author = data.data[i].author;
+                msg.is_forwarded=false;
+                msg.reply_message_id=0;
+                props.activeRoom.Messages.push(msg);
             }
-            props.activeRoom.Messages.push(msg);
-            
-            
             //setUserText("a")
             //setUserText("");
             

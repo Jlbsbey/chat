@@ -95,8 +95,6 @@ func (action CreateMessage) Process() []byte {
 		Attributes[2] = '1'
 	}
 	MsgText := []byte(action.Data.Cont.Text)
-	fmt.Println(action.Data.Cont.Text)
-	fmt.Println(MsgText)
 	us := `INSERT INTO messages (Message_ID, Author_ID, Room_ID, Text, Creation_time, Attributes, ReplyToMesID) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	_, err := db.ExecContext(context.Background(), us, MessageID, action.Data.Author, action.Data.Room_ID, MsgText, action.Data.SendTime, Attributes, action.Data.Reply)
 	if err != nil {
@@ -150,7 +148,7 @@ func (action *ReadMessage) GetFromJSON(rawData []byte) {
 	}
 }
 func (action ReadMessage) Process() []byte {
-	us := `SELECT Author_ID, Room_ID, Text, Creation_time, Attributes, ReplyToMesID FROM messages WHERE Message_id = ? OR Room_ID = ?`
+	us := `SELECT Message_ID, Author_ID, Room_ID, Text, Creation_time, Attributes, ReplyToMesID FROM messages WHERE Message_id = ? OR Room_ID = ?`
 
 	rows, err := db.Query(us, action.Data.Message_ID, action.Data.Room_ID)
 	if err != nil {
@@ -161,12 +159,11 @@ func (action ReadMessage) Process() []byte {
 	var temptime []uint8
 	var Attributes, Text, Login, quer string
 	var IsForwarded bool
-	var ReplyToMesID uint64
+	var ReplyToMesID, MessID uint64
 	var Messages []Message
 	var lg *sql.Rows
 	for rows.Next() {
-		err = rows.Scan(&Author_id, &Room_id, &Text, &temptime, &Attributes, &ReplyToMesID)
-		fmt.Println(Text)
+		err = rows.Scan(&MessID, &Author_id, &Room_id, &Text, &temptime, &Attributes, &ReplyToMesID)
 		if err != nil {
 			panic(err)
 		}
@@ -191,7 +188,7 @@ func (action ReadMessage) Process() []byte {
 				panic(err)
 			}
 			//append to array
-			Messages = append(Messages, Message{Message_ID: action.Data.Message_ID, Author: Author_id, Room_ID: Room_id, Cont: Content{Text: Text}, SendTime: Creation_time, IsForwarded: IsForwarded, Reply: ReplyToMesID, Username: Login})
+			Messages = append(Messages, Message{Message_ID: MessID, Author: Author_id, Room_ID: Room_id, Cont: Content{Text: Text}, SendTime: Creation_time, IsForwarded: IsForwarded, Reply: ReplyToMesID, Username: Login})
 
 		}
 

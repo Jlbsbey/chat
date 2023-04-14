@@ -105,8 +105,8 @@ export default function ChatScreen(props) {
                     msg.author = data.data[i].author;
                     msg.is_forwarded=false;
                     msg.reply_message_id=0;
-                    }
                     props.activeRoom.Messages.push(msg);
+                }
                 setUserText("a")
                 setUserText("");
                 
