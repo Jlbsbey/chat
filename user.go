@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/argon2"
 	"log"
 	"math/rand"
 	"time"
@@ -70,9 +72,17 @@ func (action *LoginUser) GetFromJSON(rawData []byte) {
 	}
 }
 func (action LoginUser) Process() []byte {
-	us := `SELECT Login, Password FROM users WHERE Login = ? AND Password = ?`
-
-	lg, err := db.Query(us, action.Data.Username, action.Data.Password)
+	var salt string
+	us := `SELECT salt FROM users WHERE Login = ?`
+	lg, err := db.Query(us, action.Data.Username)
+	for lg.Next() {
+		if err = lg.Scan(&salt); err != nil {
+			log.Println(err)
+		}
+	}
+	hashed := hashPassword(action.Data.Password, salt)
+	us = `SELECT Login, Password FROM users WHERE Login = ? AND Password = ?`
+	lg, err = db.Query(us, action.Data.Username, hashed)
 	if err != nil {
 		panic(err)
 	}
@@ -82,7 +92,7 @@ func (action LoginUser) Process() []byte {
 		if err = lg.Scan(&login, &passw); err != nil {
 			log.Println(err)
 		}
-		if login == action.Data.Username && passw == action.Data.Password {
+		if login == action.Data.Username && passw == hashed {
 			logined = true
 			us = `SELECT ID, Login, Email FROM users WHERE Login = ?`
 			lg, err = db.Query(us, action.Data.Username)
@@ -120,6 +130,7 @@ func (action *CreateUser) GetFromJSON(rawData []byte) {
 	}
 }
 func (action CreateUser) Process() []byte {
+
 	var count int
 	quer := `SELECT Login FROM users WHERE Login = ?`
 	lg, err := db.Query(quer, action.U.Username)
@@ -133,8 +144,10 @@ func (action CreateUser) Process() []byte {
 		}
 		return response
 	}
-	quer = `INSERT INTO users(Login, Password, Email) VALUES (?, ?, ?)`
-	_, err = db.ExecContext(context.Background(), quer, action.U.Username, action.U.Password, action.U.Email)
+	salt := createSalt()
+	hashed := hashPassword(action.U.Password, salt)
+	quer = `INSERT INTO users(Login, Password, salt, Email ) VALUES (?, ?, ?, ?)`
+	_, err = db.ExecContext(context.Background(), quer, action.U.Username, hashed, string(salt), action.U.Email)
 	if err != nil {
 		response, err := json.Marshal(Response{Action: "register", Success: false, ObjName: "user"})
 		if err != nil {
@@ -310,4 +323,25 @@ func CreateSession(us_id int) uint64 {
 	}
 	sessions[id] = us_id
 	return id
+}
+
+func hashPassword(password string, salt string) string {
+	key := argon2.IDKey([]byte(password), []byte(salt), 1, 64*1024, 4, 32)
+	return hex.EncodeToString(key)
+}
+
+func createSalt() string {
+	salt := make([]byte, 15)
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 15; i++ {
+		rndCharsmall := 'a' + byte(rand.Intn(26))
+		rndCharbig := 'A' + byte(rand.Intn(26))
+		rndChar := rand.Intn(2)
+		if rndChar == 1 {
+			salt[i] = rndCharsmall
+		} else {
+			salt[i] = rndCharbig
+		}
+	}
+	return string(salt)
 }

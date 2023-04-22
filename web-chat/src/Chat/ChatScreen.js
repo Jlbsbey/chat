@@ -106,6 +106,8 @@ export default function ChatScreen(props) {
                     msg.is_forwarded=false;
                     msg.reply_message_id=0;
                     props.activeRoom.Messages.push(msg);
+                    //setRoomList(roomList => [...roomList, room])
+                
                 }
                 setUserText("a")
                 setUserText("");
