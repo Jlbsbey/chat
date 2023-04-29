@@ -20,9 +20,55 @@ export default function ChatScreen(props) {
     const [messageAuthor, setAuthor] = React.useState("")
     const [userText, setUserText] = React.useState("");
     const [currentTime, setCurrentTime] = React.useState(new Date());
-
+    const ws = React.useRef(null)
     function userTextChange(event) {
         setUserText(event.target.value);
+    }
+
+    React.useEffect(() => {
+        ws.current = new WebSocket("ws://localhost:8080/ws");
+        ws.current.onopen = () => console.log("");
+        ws.current.onclose = () => console.log("");
+        const wsCurrent = ws.current;
+
+        return () => {
+            wsCurrent.close();
+        };
+    }, []);
+
+    React.useEffect(()=>{
+        if(!ws.current) return;
+
+        ws.current.onmessage = e => {
+            const message = JSON.parse(e.data)
+            receiveMessage(message)
+        };
+    }, []);
+
+    function receiveMessage(message){
+        console.log("dddd")
+        let msg={
+            author_id: "",
+            content:{
+                text: "",
+            },
+            date: Date,
+            is_forwarded: false, //placeholder
+            reply_message_id: 0, //placeholder
+            author: "",
+            }
+        //for(let i=0; i< data.data.length; i++){
+            msg.author_id = message.author_id;
+            msg.content.text = message.content.text;
+            msg.date = message.date;
+            msg.author = message.author;
+            msg.is_forwarded=false;
+            msg.reply_message_id=0;
+            props.activeRoom.Messages.push(msg);
+            //setRoomList(roomList => [...roomList, room])
+        
+        //}
+    props.activeRoom.Messages.push(msg);
     }
     
     function sendMessage(event) {
@@ -41,10 +87,32 @@ export default function ChatScreen(props) {
                 reply_message_id: 0, //placeholder
 
 
-            }
+            }        
         }
+        let msg={
+            author_id: "",
+            content:{
+                text: "",
+            },
+            date: Date,
+            is_forwarded: false, //placeholder
+            reply_message_id: 0, //placeholder
+            author: "",
+        }
+        msg.author_id = props.userID;
+        msg.content.text = userText;
+        msg.date = currentTime;
+        msg.author = props.username;
+        msg.is_forwarded=false;
+        msg.reply_message_id=0;
+        props.activeRoom.Messages.push(msg);
+        props.setActiveRoom(props.activeRoom)
+        ws.current.send(JSON.stringify(actn))
+        setUserText("")
+
+
         //отправить сообщение на сервер и загрузить сообщение обратно С АВТОРОМ
-        fetch(props.backendIP.concat("/"), {
+        /*fetch(props.backendIP.concat("/"), {
 			method: 'POST', 
 			mode: 'cors', 
 			cache: 'no-cache', 
@@ -106,21 +174,20 @@ export default function ChatScreen(props) {
                     msg.is_forwarded=false;
                     msg.reply_message_id=0;
                     props.activeRoom.Messages.push(msg);
+                    props.setActiveRoom(props.activeRoom)
                     //setRoomList(roomList => [...roomList, room])
                 
                 }
-                setUserText("a")
                 setUserText("");
                 
             });
             
-		});
+		});*/
 
         setUserText("");
     }
-
     return (
-        <Box m="10" sx={{ flexGrow: 1, pl: "5%", pr: "5%"}}>
+        <Box m="10" sx={{ flexGrow: 1, pl: "5%", pr: "5%"}} key={props.activeRoom}>
             <Toolbar />
             <Paper elevation={3} sx={{mt:"1%", mb:"1%"}}> {/*List with messages*/}
                 <List> 

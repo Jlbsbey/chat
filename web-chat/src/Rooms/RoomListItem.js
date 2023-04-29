@@ -12,6 +12,8 @@ import PropTypes from 'prop-types';
 //Local imports
 
 export default function RoomListItem(props) {
+    //console.log(props.activeRoom);
+    const [test, setTest] = React.useState(1);
     function changeRoom() {
         props.setActiveRoom(props.Room);
         let readmsg={
@@ -49,7 +51,8 @@ export default function RoomListItem(props) {
                 is_forwarded: false, //placeholder
                 reply_message_id: 0, //placeholder
                 author: "",
-                }
+            }
+            let temp= props.Room
             for(let i=0; i< data.data.length; i++){
                 msg.author_id = data.data[i].author_id;
                 msg.content.text = data.data[i].content.text;
@@ -57,8 +60,16 @@ export default function RoomListItem(props) {
                 msg.author = data.data[i].author;
                 msg.is_forwarded=false;
                 msg.reply_message_id=0;
-                props.activeRoom.Messages.push(msg);
+                temp.Messages.push(msg);
+                console.log(msg);
             }
+            console.log(temp);
+            props.setActiveRoom(temp);
+            props.setActiveRoom(temp);
+            props.setActiveRoom(temp);
+            props.setActiveRoom(temp);
+            setTest(test+2);
+            console.log(temp);
             //setUserText("a")
             //setUserText("");
             

@@ -87,7 +87,7 @@ export default function AddRoom(props) {
 			{/*<Button variant="standard" onClick={handleClickOpen}>
 				Login
 			</Button>*/}
-			<Button Click={handleClickOpen}>+ New Room</Button>
+			<Button onClick={handleClickOpen}>+ New Room</Button>
 			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>Add Room</DialogTitle>
 				<DialogContent>

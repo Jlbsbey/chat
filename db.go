@@ -14,7 +14,7 @@ func cfg() {
 	cfg := mysql.NewConfig()
 	(*cfg).User = "root"
 	(*cfg).Addr = "localhost"
-	(*cfg).Passwd = "nikita2005"
+	(*cfg).Passwd = "root"
 	(*cfg).Net = "tcp"
 	(*cfg).DBName = "chat"
 	var err error

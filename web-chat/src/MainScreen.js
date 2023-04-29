@@ -171,7 +171,7 @@ export default function MainScreen() {
             </Drawer>
 
             {/*This is the window with the chat*/}
-            <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP} userID={userID} setUserID={setUserID}/>
+            <ChatScreen activeRoom={activeRoom} setActiveRoom={setActiveRoom} activeSession={setSession} backendIP={backendIP} userID={userID} setUserID={setUserID} username={userName}/>
         </Box>
     );
     }

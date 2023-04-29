@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"nhooyr.io/websocket"
 )
 
 func Handler(w http.ResponseWriter, req *http.Request) {
@@ -29,9 +31,32 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func HandleWS(w http.ResponseWriter, req *http.Request) {
+	c, err := websocket.Accept(w, req, &websocket.AcceptOptions{
+		OriginPatterns: []string{"localhost:3000"},
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer c.Close(websocket.StatusInternalError, "")
+	ctx := context.Background()
+	for {
+		_, data, err := c.Read(ctx)
+		if err != nil {
+			panic(err)
+		}
+		go sendMsg(ctx, data, err, c)
+	}
+}
+
+func sendMsg(ctx context.Context, data []byte, err error, c *websocket.Conn) {
+	err = c.Write(ctx, 1, RecAction(data))
+}
+
 func main() {
 	cfg()
 	http.HandleFunc("/", Handler)
+	http.HandleFunc("/ws", HandleWS)
 
 	err := http.ListenAndServe(":8080", nil)
 	panic(err)

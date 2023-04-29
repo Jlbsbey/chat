@@ -75,6 +75,9 @@ func (action LoginUser) Process() []byte {
 	var salt string
 	us := `SELECT salt FROM users WHERE Login = ?`
 	lg, err := db.Query(us, action.Data.Username)
+	if err != nil {
+		panic(err)
+	}
 	for lg.Next() {
 		if err = lg.Scan(&salt); err != nil {
 			log.Println(err)
