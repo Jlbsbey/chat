@@ -188,6 +188,7 @@ func (action ReadMessage) Process() []byte {
 				panic(err)
 			}
 			//append to array
+			fmt.Println(Text)
 			Messages = append(Messages, Message{Message_ID: MessID, Author: Author_id, Room_ID: Room_id, Cont: Content{Text: Text}, SendTime: Creation_time, IsForwarded: IsForwarded, Reply: ReplyToMesID, Username: Login})
 
 		}
@@ -200,6 +201,7 @@ func (action ReadMessage) Process() []byte {
 		}
 		return response
 	} else {
+		fmt.Println(Messages)
 		response, err := json.Marshal(Response{Action: "read", Success: true, ObjName: "message", Data: Messages})
 		if err != nil {
 			panic(err)

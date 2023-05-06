@@ -51,6 +51,7 @@ const emptyRoom = {
     Name: "",
     Messages: [],
     ID: 0,
+    loaded: false,
     //...
 }
 

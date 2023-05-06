@@ -76,8 +76,9 @@ export default function AddRoom(props) {
 		}).then(data => {
 			if (data.success == true){
 				alert("Adding room was successfull");
+				setLoginDone(true);
 			//setLoginDone(true);
-			setOpen(true);
+			setOpen(false);
 			}
 		});
 	}

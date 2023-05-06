@@ -19,6 +19,7 @@ import MessageListItem from './MessageListItem';
 export default function ChatScreen(props) {
     const [messageAuthor, setAuthor] = React.useState("")
     const [userText, setUserText] = React.useState("");
+
     const [currentTime, setCurrentTime] = React.useState(new Date());
     const ws = React.useRef(null)
     function userTextChange(event) {
@@ -32,7 +33,7 @@ export default function ChatScreen(props) {
         const wsCurrent = ws.current;
 
         return () => {
-            wsCurrent.close();
+            //wsCurrent.close();
         };
     }, []);
 
@@ -46,7 +47,6 @@ export default function ChatScreen(props) {
     }, []);
 
     function receiveMessage(message){
-        console.log("dddd")
         let msg={
             author_id: "",
             content:{
@@ -57,7 +57,7 @@ export default function ChatScreen(props) {
             reply_message_id: 0, //placeholder
             author: "",
             }
-        //for(let i=0; i< data.data.length; i++){
+        if(message.action == "sync" && message.object == "message"){    
             msg.author_id = message.author_id;
             msg.content.text = message.content.text;
             msg.date = message.date;
@@ -65,9 +65,7 @@ export default function ChatScreen(props) {
             msg.is_forwarded=false;
             msg.reply_message_id=0;
             props.activeRoom.Messages.push(msg);
-            //setRoomList(roomList => [...roomList, room])
-        
-        //}
+        }
     props.activeRoom.Messages.push(msg);
     }
     
@@ -106,11 +104,11 @@ export default function ChatScreen(props) {
         msg.is_forwarded=false;
         msg.reply_message_id=0;
         props.activeRoom.Messages.push(msg);
+        
         props.setActiveRoom(props.activeRoom)
         ws.current.send(JSON.stringify(actn))
-        setUserText("")
-
-
+        setUserText("");     
+        setAuthor(props.username);   
         //отправить сообщение на сервер и загрузить сообщение обратно С АВТОРОМ
         /*fetch(props.backendIP.concat("/"), {
 			method: 'POST', 
@@ -184,7 +182,7 @@ export default function ChatScreen(props) {
             
 		});*/
 
-        setUserText("");
+        
     }
     return (
         <Box m="10" sx={{ flexGrow: 1, pl: "5%", pr: "5%"}} key={props.activeRoom}>
