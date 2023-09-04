@@ -61,7 +61,7 @@ export default function RoomListItem(props) {
                 }
                 props.activeRoom.loaded=true;
                 //props.setActiveRoom(props.Room);
-                props.setActiveRoom(props.activeRoom);
+                //props.setActiveRoom(props.activeRoom);
                 console.log(temp);
                 console.log(temp);
                 

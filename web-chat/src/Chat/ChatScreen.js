@@ -70,45 +70,49 @@ export default function ChatScreen(props) {
     }
     
     function sendMessage(event) {
-        setCurrentTime(new Date());
-        let actn = {
-            action: "register",
-            object: "message",
-            data: {
-                room_id: props.activeRoom.ID,
-                author_id: props.userID,
+        if(props.activeRoom.ID!=0){
+
+        
+            setCurrentTime(new Date());
+            let actn = {
+                action: "register",
+                object: "message",
+                data: {
+                    room_id: props.activeRoom.ID,
+                    author_id: props.userID,
+                    content:{
+                        text: userText,
+                    },
+                    date: currentTime,
+                    is_forwarded: false, //placeholder
+                    reply_message_id: 0, //placeholder
+
+
+                }        
+            }
+            let msg={
+                author_id: "",
                 content:{
-                    text: userText,
+                    text: "",
                 },
-                date: currentTime,
+                date: Date,
                 is_forwarded: false, //placeholder
                 reply_message_id: 0, //placeholder
-
-
-            }        
+                author: "",
+            }
+            msg.author_id = props.userID;
+            msg.content.text = userText;
+            msg.date = currentTime;
+            msg.author = props.username;
+            msg.is_forwarded=false;
+            msg.reply_message_id=0;
+            props.activeRoom.Messages.push(msg);
+            
+            props.setActiveRoom(props.activeRoom)
+            ws.current.send(JSON.stringify(actn))
         }
-        let msg={
-            author_id: "",
-            content:{
-                text: "",
-            },
-            date: Date,
-            is_forwarded: false, //placeholder
-            reply_message_id: 0, //placeholder
-            author: "",
-        }
-        msg.author_id = props.userID;
-        msg.content.text = userText;
-        msg.date = currentTime;
-        msg.author = props.username;
-        msg.is_forwarded=false;
-        msg.reply_message_id=0;
-        props.activeRoom.Messages.push(msg);
-        
-        props.setActiveRoom(props.activeRoom)
-        ws.current.send(JSON.stringify(actn))
-        setUserText("");     
-        setAuthor(props.username);   
+        //setUserText("");     
+        //setAuthor(props.username);   
         //отправить сообщение на сервер и загрузить сообщение обратно С АВТОРОМ
         /*fetch(props.backendIP.concat("/"), {
 			method: 'POST', 
